@@ -1,20 +1,20 @@
 {
   "name": "rtcp-react-native",
   "version": "0.0.1",
-  "description": "React Native library for RTCP",
-  "main": "index.js",
+  "description": "React Native module for integration with RTCP",
+  "main": "RTCP.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "hubert.nusser@interswitchgroup.com",
-  "license": "ISC",
+  "author": "Hubert Nusser <hubert.nusser@interswitchgroup.com>",
+  "homepage": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
+  "repository": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
+  "license": "MIT",
   "peerDependencies": {
-    "react-native-push-notification": ">= 6.0.0",
     "react": "^16.13.1",
-    "react-native": "^0.63.3"
-  },
-  "dependencies": {
-    "@react-native-community/async-storage": "^1.12.1",
-    "react-native-device-info": "^6.2.0"
+    "react-native": "^0.63.3",
+    "react-native-device-info": "^6.2.0",
+    "react-native-push-notification": ">= 6.0.0",
+    "react-native-default-preference": "^1.4.3"
   }
 }
