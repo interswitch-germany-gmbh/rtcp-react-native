@@ -1,4 +1,4 @@
-import RTCPApi from "./rtcp_api.js";
+import RTCPApi from "./RTCPApi.js";
 
 import PushNotification from "react-native-push-notification";
 import DeviceInfo from "react-native-device-info";
@@ -91,7 +91,7 @@ class RTCP {
         // TODO: distinguish between iOS and Android and if triggered by tapping or not
 
         // check if a valid notification has been received from RTCP
-        const app_data = notification.data.app_data ? notification.data.app_data : {};
+        var app_data = notification.data.app_data ? notification.data.app_data : {};
         // on android additional data seems to be present as String
         if (typeof app_data === "string") {
             app_data = JSON.parse(app_data);
