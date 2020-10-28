@@ -1,7 +1,7 @@
 import UserNotifications
 
 public class RTCP {
-    static let EXTENSION_SUFFIX = "RTCP-NotificationServiceExtension"
+    static let EXTENSION_SUFFIX = "RTCPNotificationServiceExtension"
 
     static var contentHandler: ((UNNotificationContent) -> Void)?
     static var request: UNNotificationRequest?
