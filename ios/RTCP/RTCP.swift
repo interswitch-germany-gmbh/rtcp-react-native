@@ -1,62 +1,41 @@
-import UserNotifications
+import Foundation
+import RNCPushNotificationIOS
 
-public class RTCP {
-    static let EXTENSION_SUFFIX = "RTCPNotificationServiceExtension"
 
-    static var contentHandler: ((UNNotificationContent) -> Void)?
-    static var request: UNNotificationRequest?
+@objc public class RTCP: NSObject {
 
-    public class func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        // store request and contentHandler for possible later use in expire function
-        RTCP.request = request
-        RTCP.contentHandler = contentHandler
-
-        if let bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent) {
-
-            // --- ADD OPTIONAL MEDIA ---
-            if let appData = request.content.userInfo["app_data"] as? [String: AnyObject],  // check for payload "app_data"
-               let mediaURLString = appData["media_url"] as? String,                        // and media_url in it
-               let mediaURL = URL(string: mediaURLString),                                  // create URL off image_url
-               let data = try? Data(contentsOf: mediaURL) {                                 // and download its content to memory
-
-                // write image from memory to local temporary file
-                let destinationUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(mediaURL.lastPathComponent)
-                try? data.write(to: destinationUrl)
-                if let attachment = try? UNNotificationAttachment(identifier: "", url: destinationUrl) {
-                    bestAttemptContent.attachments = [attachment]
-                }
-            }
-
-            bestAttemptContent.title = "\(bestAttemptContent.title) [v2]"
-            contentHandler(bestAttemptContent)
-        }
-
-        // --- DELIVERY RECEIPT ---
-        if let appData = request.content.userInfo["app_data"] as? [String: AnyObject],  // check for payload "app_data"
-           let pushID = appData["push_id"] as? String,                                  // and a valid push_id in it
-
-           let bundle = Bundle.main.bundleIdentifier,                                   // get extension bundle ID
-           bundle.hasSuffix(RTCP.EXTENSION_SUFFIX),                                     // check extension bundle ID for correct naming
-           let bundleBase = bundle.prefix(upTo: bundle.index(                           // remove extension name suffix from bundle ID
-                                            bundle.endIndex,
-                                            offsetBy: -(RTCP.EXTENSION_SUFFIX.count + 1))) as Substring?,
-           let userDefaults = UserDefaults(suiteName: "group." + bundleBase + ".rtcp"), // get shared configuration by app group
-
-           let baseUrl    = userDefaults.string(forKey: "rtcp_base_url"),               // get base_url, app_id and hardware_id from storage (saved by main app on start)
-           let appID      = userDefaults.string(forKey: "rtcp_app_id"),
-           let hardwareID = userDefaults.string(forKey: "rtcp_hardware_id") {
-
-            // send reception info to server
-            RTCPApi.appID = appID
-            RTCPApi.baseUrl = baseUrl
-            RTCPApi.updateNotificationRemoteStatus(hardwareID: hardwareID, pushIDs: pushID, status: "received")
-        }
-
+    // called when device push notification registration was successful
+    @objc public class func didRegisterForRemoteNotifications(withDeviceToken deviceToken: Data) {
+        // forward to push-notification-ios module
+        RNCPushNotificationIOS.didRegisterForRemoteNotifications(withDeviceToken: deviceToken)
     }
 
-    public class func serviceExtensionTimeWillExpire() {
-        // not implemented
+    // called when device push notification registration failed
+    @objc public class func didFailToRegisterForRemoteNotifications(withError error: Error) {
+        // forward to push-notification-ios module
+        RNCPushNotificationIOS.didFailToRegisterForRemoteNotificationsWithError(error)
+    }
+
+    @objc public class func didReceiveRemoteNotification(_ userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+
+        if UIApplication.shared.applicationState == .background {
+            // delay execution to give app time to start up when killed
+            // this enables us to receive and process silent push notification in JS when the app has been killed
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                RNCPushNotificationIOS.didReceiveRemoteNotification(userInfo, fetchCompletionHandler:completionHandler)
+            }
+        }
+        // TODO: currently ".background" is true for both, when the app was killed or in background. maybe find a way to detect if it was killed
+    }
+
+    @objc public class func didFinishLaunching(withOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]) {
+        // register for remote notification on every app start
+        // actually, the push-notification-ios module calls this, but too late after appstart for making silent-pushes-when-app-killed being processed
+        UIApplication.shared.registerForRemoteNotifications()
+    }
+
+    @objc public class func didReceiveNotificationResponse(_ response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        // forward to push-notification-ios module
+        RNCPushNotificationIOS.didReceive(response)
     }
 }
-
-

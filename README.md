@@ -2,31 +2,43 @@
 
 © Interswitch Germany GmbH
 
+- [About](#about)
+- [Installation](#installation)
+  - [Android Setup](#android-setup)
+  - [iOS Setup](#ios-setup)
+- [Usage](#usage)
+- [Reference - Core module](#reference---core-module)
+  - [Configuration](#configuration)
+  - [Methods](#methods)
+  - [Events](#events)
+- [Reference - Inbox module](#reference---inbox-module)
+  - [Configuration](#configuration-1)
+
 ## About
 
 This is a React Native module for integrating Push Notifications with Interswitch's [RTCP Platform](https://rtcp.vanso.com)
 
 ## Installation
 
-Add the module to your React Native app (as yet requires access to the private repository):
+- Add the module to your React Native app (as yet requires access to the private repository):
 
-```sh
-# using yarn
-yarn add https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  ```sh
+  # using yarn
+  yarn add https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
 
-# using npm
-npm install https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
-```
+  # using npm
+  npm install https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  ```
 
-Add all required peerDependencies:
+- Add all required peerDependencies:
 
-```sh
-# using yarn
-yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  ```sh
+  # using yarn
+  yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
 
-# using npm
-npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
-```
+  # using npm
+  npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  ```
 
 ### Android Setup
 
@@ -91,8 +103,18 @@ This module uses the [react-native-push-notification](https://github.com/zo0r/re
 
 ### iOS Setup
 
-This module uses the [@react-native-community/push-notification-ios](https://github.com/react-native-push-notification-ios/push-notification-ios) module for iOS. Here is what's required to set it up. On issues please look for updated instructions on its website.
+This module uses the [@react-native-community/push-notification-ios](https://github.com/react-native-push-notification-ios/push-notification-ios) module for iOS. Setup slightly differs from their instructions.
 
+- Adjust your `/ios/Podfile` to create module headers for *push-notification-ios*:
+  
+  ```ruby
+  ...
+  target '<yourReactNativeProject>' do
+    ...
+    # add this line
+    pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios', :modular_headers => true
+    ...
+  ```
 - Install the required Pods in your iOS project by running:
 
   ```sh
@@ -106,83 +128,64 @@ This module uses the [@react-native-community/push-notification-ios](https://git
   - *Background Modes*, then tick *Remote notifications*
   - *Push Notifications*
 - Augment your Appdelegate  
-  Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
+  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
 
-  ```obj-c
-  // --> add this to the top of the file
-  #import <UserNotifications/UNUserNotificationCenter.h>
-  ```
+    ```obj-c
+    // --> add this to the top of the file
+    #import <UserNotifications/UNUserNotificationCenter.h>
+    ```
 
-  ```obj-c
-  // --> add 'UNUserNotificationCenterDelegate' in this line
-  @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate, UNUserNotificationCenterDelegate>
-  ```
+    ```obj-c
+    // --> add ', UNUserNotificationCenterDelegate' to protocols in this line
+    @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate, UNUserNotificationCenterDelegate>
+    ```
 
-  Modify the file `/ios/<yourReactNativeProject>/AppDelegate.m`
+  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.m`
 
-  ```obj-c
-  // --> add this to the top of the file
-  #import <UserNotifications/UserNotifications.h>
-  #import <RNCPushNotificationIOS.h>
-  ```
+    ```obj-c
+    // --> add this to the top of the file
+    #import <UserNotifications/UserNotifications.h>
+    @import RTCP;
+    ```
 
-  ```obj-c
-  // - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-  // {
-  //   ...
-    // --> add the following two lines before "return YES;" in the "didFinishLaunchingWithOptions" method
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    center.delegate = self;
-  //
-  //   return YES;
-  // }  
-  ```
+    ```obj-c
+    // - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+    // {
+    //   ...
+      // --> add the following two lines before "return YES;" in the "didFinishLaunchingWithOptions" method
+      [RTCP didFinishLaunchingWithOptions:launchOptions];
+      UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+      center.delegate = self;
+    //
+    //   return YES;
+    // }  
+    ```
 
-  ```obj-c
-  // --> add these lines before "@end" at the end of the file
+    ```obj-c
+    // --> add these lines (before "@end" at the end of the file)
+    - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+        [RTCP didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+      }
 
-  // Called when a notification is delivered to a foreground app.
-  -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
-  {
-    completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
-  }
+    - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+      [RTCP didFailToRegisterForRemoteNotificationsWithError:error];
+    }
 
-  // Required for the register event.
-  - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
-  {
-  [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
-  }
-  // Required for the notification event. You must call the completion handler after handling the remote notification.
-  - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-  fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-  {
-    [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-  }
-  // Required for the registrationError event.
-  - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
-  {
-  [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
-  }
-  // Required for localNotification event
-  - (void)userNotificationCenter:(UNUserNotificationCenter *)center
-  didReceiveNotificationResponse:(UNNotificationResponse *)response
-          withCompletionHandler:(void (^)(void))completionHandler
-  {
-    [RNCPushNotificationIOS didReceiveNotificationResponse:response];
-  }
+    - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
+      [RTCP didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+    }
+    // @end
+    ```
 
-  // @end
-  ```
-
-In order to make extended features, like Rich Push and Delivery Receipt, working, you need to set up the *Notification Service Extension* in your project:
+In order to enable extended features like Rich Push and Delivery Receipt you need to set up a *Notification Service Extension* in your project:
 
 - Add a Notification Service Extension:
   - Open your .xcworkspace. In the menu select *File -> New -> Target...*
   - Choose *Notification Service Extension*
   - For *Product Name* enter: `RTCPNotificationServiceExtension`
   - Ensure `Swift` is selected as *Language*
-  - Choose *Finish* and at the following popup dialog do not activate the scheme, click *Cancel* instead
-  - Select the new target `RTCPNotificationServiceExtension` in the project and targets list, go to *General*. Under *Deployment Info* choose `iOS 10.0`
+  - Choose *Finish*. At the following popup dialog do not activate the scheme, click *Cancel* instead
+  - Select the new target `RTCPNotificationServiceExtension` in the *Project and Targets list*, go to *General*. Under *Deployment Info* choose: `iOS 10.0`
   - In *Project Explorer* open `RTCPNotificationServiceExtension/NotificationService.swift` and replace its entire content with:
 
     ```swift
@@ -191,11 +194,11 @@ In order to make extended features, like Rich Push and Delivery Receipt, working
 
     class NotificationService: UNNotificationServiceExtension {
         override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-            RTCP.didReceive(request, withContentHandler: contentHandler)
+            RTCPExt.didReceive(request, withContentHandler: contentHandler)
         }
 
         override func serviceExtensionTimeWillExpire() {
-            RTCP.serviceExtensionTimeWillExpire()
+            RTCPExt.serviceExtensionTimeWillExpire()
         }
     }
     ```
@@ -214,14 +217,15 @@ In order to make extended features, like Rich Push and Delivery Receipt, working
   - Under *TARGETS* now select the Extension `RTCPNotificationServiceExtension`
   - Add the capability *App Group* here as well
   - Under the shown list of *App Groups* tick the very same app group created above
-- Add the RTCP Pod libary to the Notification Service Extension
+- Add the RTCP library Pod to the Notification Service Extension
   - Add this to the end of your Podfile at `/ios/Podfile`:
 
     ```ruby
     target 'RTCPNotificationServiceExtension' do
-      pod 'RTCP', path: '../node_modules/rtcp-react-native'
+      pod 'RTCP/RTCPExt', path: '../node_modules/rtcp-react-native'
     end
     ```
+
   - Have cocoapods install the Pod in the new target:
 
     ```sh
@@ -235,13 +239,108 @@ In order to make extended features, like Rich Push and Delivery Receipt, working
 
 Import and initialize the module in your application's main file:
 
+> ❗ Make sure to initialize this module **outside of any component** (even `App`) or handlers will not be triggered correctly. Best is to do this at the top level of your main application file.
+
 ```javascript
 import RTCP from 'rtcp-react-native';
 
 // do this outside of any component
 RTCP.init({
-  appID: '1234567890abcdef'
+  appID: '1234567890abcdef' // <-- mandatory parameter
+  production: false
 });
 ```
 
-> ❗ Make sure to initialize this module **outside of any component** (even `App`) or handlers will not be triggered correctly. Best is to do this at top level of your main application file.
+If you want to use the integrated Inbox, you also need to initialize it and ensure this happens *after* the main initialization has finished:
+
+```javascript
+RTCP.init({
+  appID: '1234567890abcdef'
+  // ... possibly more options
+}).then(() =>
+  RTCPInbox.init({
+    inboxSize: 25
+  }),
+);
+```
+
+## Reference - Core module
+
+### Configuration
+
+* **`appID`** *(String) - mandatory*  
+The 16 characters hash string of your application in RTCP
+
+* **`production`** *(Boolean) - optional, default: `false`*  
+Whether to connect to RTCP Staging or Production
+
+* **`enableLogging`** *(Boolean) - optional, default: `true`*  
+If true, log actions to console.log
+
+* **`clearOnStart`** *(Boolean) - optional, default: `true`*  
+Remove all notifications from the OS's notification center when the app is opened.
+
+* **`channelName`** *(String) - optional, default: `"Push Notifications"` - Android only*  
+Currently, RTCP only supports one single notification channel for Android. You can define the name of the notification channel as is appears in Androids Notification Settings for your app
+
+### Methods
+
+- **`async init(options)`**  
+  Initializes the rtcp-react-native module with the provided `options`.
+  Besides general module configuration, this sets up your app to receive push notifications and registers your device with RTCP.  
+  This method needs to be called outside of any component (even `App`)!  
+  *Parameters*  
+  - `options` *(Object)* - (hash) object containing module configuration (see *Configuration*)
+
+- **`async sendReadReceipt(push_ids)`**  
+  Sets the status of `push_ids` to "read" on the RTCP server.  
+  *Parameters*
+  - `push_ids` *(String / Array(String))* - one or more push_ids
+
+- **`async getRecentNotifications(count = 10)`**  
+  Get the `count` most recent notifications from the RTCP server.  
+  *Parameters*  
+  - `count` *(Number)* - number of notifications to fetch
+
+  *Return Value*  
+  - Array of notifications (see RTCP docs for details)
+
+- **`registerEventHandler(event, handler)`**  
+  Register a `handler` function to be called when `event` is emitted.  
+  *Parameters*
+  - `event` *(String)* - event to be registered for
+  - `handler` *(Function)* - function to be called
+
+- **`unregisterEventHandler(event, handler)`**  
+  Removes a `handler` function from the `event` list.  
+  *Parameters*
+  - `event` *(String)* - event for which to be removed
+  - `handler` *(Function)* - function to be removed
+
+### Events
+- **`"onRemoteNotification": (notification)`**  
+  Called whenever a push notification is received from the RTCP server.  
+  *Function parameters*  
+  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+
+- **`"onNotificationTapped": (notification)`**  
+  Called when the app is opened by the user having tapped a notification in the OS's notification center.  
+  *Function parameters*  
+  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+
+- **`"onRegister"`**  
+  Called when the app has successfully been registered with the RTCP server.
+
+## Reference - Inbox module
+
+### Configuration
+
+- **`enableBadge`** *(Boolean) - optional, default: `true`*  
+  Show a badge with the count of unread messages on the app's icon (on Android this does not work with all launch center variants and settings).
+
+- **`inboxSize`** *(Number) - optional, default: `25`*  
+  The maximum size of inbox entries. This defines how many entries are stored locally on the phone and fetched from the server.
+
+- **`syncOnAppstart`** *(Boolean) - optional, default: `false`*  
+  If `true` the inbox gets synced from the server when the app is opened. Usually, this is not required, since push notifications are added to the local inbox as they come in.  
+  Note that in order to reduce server load, the inbox is only synced if the last sync was longer than 10 seconds ago.
