@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "08E03E9325472A3700051E85"
+               BlueprintIdentifier = "08C380A2256428360013D0C7"
                BuildableName = "libRTCP.a"
                BlueprintName = "RTCP"
                ReferencedContainer = "container:RTCP.xcodeproj">
@@ -50,7 +50,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "08E03E9325472A3700051E85"
+            BlueprintIdentifier = "08C380A2256428360013D0C7"
             BuildableName = "libRTCP.a"
             BlueprintName = "RTCP"
             ReferencedContainer = "container:RTCP.xcodeproj">

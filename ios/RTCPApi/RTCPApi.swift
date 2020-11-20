@@ -1,19 +1,13 @@
-//
-//  RTCPApi.swift
-//  RTCP
-//
-//  Created by Hubert Nusser on 27.10.20.
-//
 import Foundation
 
-class RTCPApi {
+public class RTCPApi {
     static let RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/"
     static let RTCP_BASE_URL_PROD = "https://rtcp.vanso.com/api/"
 
-    static var baseUrl = RTCP_BASE_URL_TEST
-    static var appID = ""
+    public static var baseUrl = RTCP_BASE_URL_TEST
+    public static var appID = ""
 
-    class func updateNotificationRemoteStatus(hardwareID: String, pushIDs: String, status: String) {
+    public class func updateNotificationRemoteStatus(hardwareID: String, pushIDs: String, status: String) {
         if !(status == "received" || status == "read") { return }
 
         var request = URLRequest(url: URL(string: RTCPApi.baseUrl + "read_receipt/" + status)!)

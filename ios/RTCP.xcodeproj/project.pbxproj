@@ -3,16 +3,48 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		087CA69025483CF900391776 /* RTCPApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087CA68F25483CF900391776 /* RTCPApi.swift */; };
-		08E03E9825472A3700051E85 /* RTCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E03E9725472A3700051E85 /* RTCP.swift */; };
+		08C380A7256428360013D0C7 /* RTCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C380A6256428360013D0C7 /* RTCP.swift */; };
+		08C380B52564284B0013D0C7 /* RTCPApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C380B42564284B0013D0C7 /* RTCPApi.swift */; };
+		08C380C22564285C0013D0C7 /* RTCPExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C380C12564285C0013D0C7 /* RTCPExt.swift */; platformFilter = ios; };
+		2C18B71D8AA2114DCE8C7724 /* libPods-RTCP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E8E2E66FE67E525C19FA59A /* libPods-RTCP.a */; };
+		573B4A216746102063FA740A /* libPods-RTCPApi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BDF789EA1536ED1153C0FDDA /* libPods-RTCPApi.a */; };
+		5D462512149E28930332E9A3 /* libPods-RTCPExt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 548F9B4D91E1760D4B1B04AC /* libPods-RTCPExt.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		08C380C925642ADB0013D0C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08C3809B256428360013D0C7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08C380B12564284B0013D0C7;
+			remoteInfo = RTCPApi;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
-		08E03E9225472A3700051E85 /* CopyFiles */ = {
+		08C380A1256428360013D0C7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380B02564284B0013D0C7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380BD2564285C0013D0C7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -24,57 +56,132 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		087CA68F25483CF900391776 /* RTCPApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCPApi.swift; sourceTree = "<group>"; };
-		08E03E9425472A3700051E85 /* libRTCP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRTCP.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		08E03E9725472A3700051E85 /* RTCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCP.swift; sourceTree = "<group>"; };
+		0557846EE8FCF40D4ED2423F /* Pods-RTCP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCP.release.xcconfig"; path = "Target Support Files/Pods-RTCP/Pods-RTCP.release.xcconfig"; sourceTree = "<group>"; };
+		08C380A3256428360013D0C7 /* libRTCP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRTCP.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		08C380A6256428360013D0C7 /* RTCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCP.swift; sourceTree = "<group>"; };
+		08C380B22564284B0013D0C7 /* libRTCPApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRTCPApi.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		08C380B42564284B0013D0C7 /* RTCPApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCPApi.swift; sourceTree = "<group>"; };
+		08C380BF2564285C0013D0C7 /* libRTCPExt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRTCPExt.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		08C380C12564285C0013D0C7 /* RTCPExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCPExt.swift; sourceTree = "<group>"; };
+		548F9B4D91E1760D4B1B04AC /* libPods-RTCPExt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RTCPExt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6457BD58FB1EC35DBE3C67FE /* Pods-RTCPExt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCPExt.release.xcconfig"; path = "Target Support Files/Pods-RTCPExt/Pods-RTCPExt.release.xcconfig"; sourceTree = "<group>"; };
+		6E8E2E66FE67E525C19FA59A /* libPods-RTCP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RTCP.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		858F9CCAE51EC9C811698D9B /* Pods-RTCPExt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCPExt.debug.xcconfig"; path = "Target Support Files/Pods-RTCPExt/Pods-RTCPExt.debug.xcconfig"; sourceTree = "<group>"; };
+		BDF789EA1536ED1153C0FDDA /* libPods-RTCPApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RTCPApi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD1A77E6C714A75C93A93BB8 /* Pods-RTCPApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCPApi.debug.xcconfig"; path = "Target Support Files/Pods-RTCPApi/Pods-RTCPApi.debug.xcconfig"; sourceTree = "<group>"; };
+		E445DC71B2E9CCFBCF35CC46 /* Pods-RTCP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCP.debug.xcconfig"; path = "Target Support Files/Pods-RTCP/Pods-RTCP.debug.xcconfig"; sourceTree = "<group>"; };
+		EEDA46FCB801F2444D4098B6 /* Pods-RTCPApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RTCPApi.release.xcconfig"; path = "Target Support Files/Pods-RTCPApi/Pods-RTCPApi.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		08E03E9125472A3700051E85 /* Frameworks */ = {
+		08C380A0256428360013D0C7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C18B71D8AA2114DCE8C7724 /* libPods-RTCP.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380AF2564284B0013D0C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				573B4A216746102063FA740A /* libPods-RTCPApi.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380BC2564285C0013D0C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D462512149E28930332E9A3 /* libPods-RTCPExt.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		08E03E8B25472A3700051E85 = {
+		08C3809A256428360013D0C7 = {
 			isa = PBXGroup;
 			children = (
-				08E03E9625472A3700051E85 /* RTCP */,
-				08E03E9525472A3700051E85 /* Products */,
+				08C380A5256428360013D0C7 /* RTCP */,
+				08C380B32564284B0013D0C7 /* RTCPApi */,
+				08C380C02564285C0013D0C7 /* RTCPExt */,
+				08C380A4256428360013D0C7 /* Products */,
+				9B38BCFD3A8C3BA9DA57BB9E /* Pods */,
+				C9D0B3889CD7656C19E5A4C4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		08E03E9525472A3700051E85 /* Products */ = {
+		08C380A4256428360013D0C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				08E03E9425472A3700051E85 /* libRTCP.a */,
+				08C380A3256428360013D0C7 /* libRTCP.a */,
+				08C380B22564284B0013D0C7 /* libRTCPApi.a */,
+				08C380BF2564285C0013D0C7 /* libRTCPExt.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		08E03E9625472A3700051E85 /* RTCP */ = {
+		08C380A5256428360013D0C7 /* RTCP */ = {
 			isa = PBXGroup;
 			children = (
-				08E03E9725472A3700051E85 /* RTCP.swift */,
-				087CA68F25483CF900391776 /* RTCPApi.swift */,
+				08C380A6256428360013D0C7 /* RTCP.swift */,
 			);
 			path = RTCP;
+			sourceTree = "<group>";
+		};
+		08C380B32564284B0013D0C7 /* RTCPApi */ = {
+			isa = PBXGroup;
+			children = (
+				08C380B42564284B0013D0C7 /* RTCPApi.swift */,
+			);
+			path = RTCPApi;
+			sourceTree = "<group>";
+		};
+		08C380C02564285C0013D0C7 /* RTCPExt */ = {
+			isa = PBXGroup;
+			children = (
+				08C380C12564285C0013D0C7 /* RTCPExt.swift */,
+			);
+			path = RTCPExt;
+			sourceTree = "<group>";
+		};
+		9B38BCFD3A8C3BA9DA57BB9E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E445DC71B2E9CCFBCF35CC46 /* Pods-RTCP.debug.xcconfig */,
+				0557846EE8FCF40D4ED2423F /* Pods-RTCP.release.xcconfig */,
+				DD1A77E6C714A75C93A93BB8 /* Pods-RTCPApi.debug.xcconfig */,
+				EEDA46FCB801F2444D4098B6 /* Pods-RTCPApi.release.xcconfig */,
+				858F9CCAE51EC9C811698D9B /* Pods-RTCPExt.debug.xcconfig */,
+				6457BD58FB1EC35DBE3C67FE /* Pods-RTCPExt.release.xcconfig */,
+			);
+			name = Pods;
+			path = ../Pods;
+			sourceTree = "<group>";
+		};
+		C9D0B3889CD7656C19E5A4C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6E8E2E66FE67E525C19FA59A /* libPods-RTCP.a */,
+				BDF789EA1536ED1153C0FDDA /* libPods-RTCPApi.a */,
+				548F9B4D91E1760D4B1B04AC /* libPods-RTCPExt.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		08E03E9325472A3700051E85 /* RTCP */ = {
+		08C380A2256428360013D0C7 /* RTCP */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 08E03E9B25472A3700051E85 /* Build configuration list for PBXNativeTarget "RTCP" */;
+			buildConfigurationList = 08C380AA256428360013D0C7 /* Build configuration list for PBXNativeTarget "RTCP" */;
 			buildPhases = (
-				08E03E9025472A3700051E85 /* Sources */,
-				08E03E9125472A3700051E85 /* Frameworks */,
-				08E03E9225472A3700051E85 /* CopyFiles */,
+				F2386AE604F30A9C65D1E461 /* [CP] Check Pods Manifest.lock */,
+				08C3809F256428360013D0C7 /* Sources */,
+				08C380A0256428360013D0C7 /* Frameworks */,
+				08C380A1256428360013D0C7 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -82,24 +189,67 @@
 			);
 			name = RTCP;
 			productName = RTCP;
-			productReference = 08E03E9425472A3700051E85 /* libRTCP.a */;
+			productReference = 08C380A3256428360013D0C7 /* libRTCP.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		08C380B12564284B0013D0C7 /* RTCPApi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08C380B62564284B0013D0C7 /* Build configuration list for PBXNativeTarget "RTCPApi" */;
+			buildPhases = (
+				EA476B63DF40B69BA36B380D /* [CP] Check Pods Manifest.lock */,
+				08C380AE2564284B0013D0C7 /* Sources */,
+				08C380AF2564284B0013D0C7 /* Frameworks */,
+				08C380B02564284B0013D0C7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RTCPApi;
+			productName = RTCPApi;
+			productReference = 08C380B22564284B0013D0C7 /* libRTCPApi.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		08C380BE2564285C0013D0C7 /* RTCPExt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08C380C32564285C0013D0C7 /* Build configuration list for PBXNativeTarget "RTCPExt" */;
+			buildPhases = (
+				676CCB922826939FECBB32E1 /* [CP] Check Pods Manifest.lock */,
+				08C380BB2564285C0013D0C7 /* Sources */,
+				08C380BC2564285C0013D0C7 /* Frameworks */,
+				08C380BD2564285C0013D0C7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				08C380CA25642ADB0013D0C7 /* PBXTargetDependency */,
+			);
+			name = RTCPExt;
+			productName = RTCPExt;
+			productReference = 08C380BF2564285C0013D0C7 /* libRTCPExt.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		08E03E8C25472A3700051E85 /* Project object */ = {
+		08C3809B256428360013D0C7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1200;
 				TargetAttributes = {
-					08E03E9325472A3700051E85 = {
+					08C380A2256428360013D0C7 = {
+						CreatedOnToolsVersion = 12.0.1;
+					};
+					08C380B12564284B0013D0C7 = {
+						CreatedOnToolsVersion = 12.0.1;
+					};
+					08C380BE2564285C0013D0C7 = {
 						CreatedOnToolsVersion = 12.0.1;
 					};
 				};
 			};
-			buildConfigurationList = 08E03E8F25472A3700051E85 /* Build configuration list for PBXProject "RTCP" */;
+			buildConfigurationList = 08C3809E256428360013D0C7 /* Build configuration list for PBXProject "RTCP" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -107,30 +257,125 @@
 				en,
 				Base,
 			);
-			mainGroup = 08E03E8B25472A3700051E85;
-			productRefGroup = 08E03E9525472A3700051E85 /* Products */;
+			mainGroup = 08C3809A256428360013D0C7;
+			productRefGroup = 08C380A4256428360013D0C7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				08E03E9325472A3700051E85 /* RTCP */,
+				08C380A2256428360013D0C7 /* RTCP */,
+				08C380B12564284B0013D0C7 /* RTCPApi */,
+				08C380BE2564285C0013D0C7 /* RTCPExt */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		676CCB922826939FECBB32E1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RTCPExt-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EA476B63DF40B69BA36B380D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RTCPApi-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F2386AE604F30A9C65D1E461 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RTCP-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		08E03E9025472A3700051E85 /* Sources */ = {
+		08C3809F256428360013D0C7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08E03E9825472A3700051E85 /* RTCP.swift in Sources */,
-				087CA69025483CF900391776 /* RTCPApi.swift in Sources */,
+				08C380A7256428360013D0C7 /* RTCP.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380AE2564284B0013D0C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08C380B52564284B0013D0C7 /* RTCPApi.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C380BB2564285C0013D0C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08C380C22564285C0013D0C7 /* RTCPExt.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		08C380CA25642ADB0013D0C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 08C380B12564284B0013D0C7 /* RTCPApi */;
+			targetProxy = 08C380C925642ADB0013D0C7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		08E03E9925472A3700051E85 /* Debug */ = {
+		08C380A8256428360013D0C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -184,14 +429,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		08E03E9A25472A3700051E85 /* Release */ = {
+		08C380A9256428360013D0C7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -246,8 +491,35 @@
 			};
 			name = Release;
 		};
-		08E03E9C25472A3700051E85 /* Debug */ = {
+		08C380AB256428360013D0C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E445DC71B2E9CCFBCF35CC46 /* Pods-RTCP.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = M28B7CT6HR;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		08C380AC256428360013D0C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0557846EE8FCF40D4ED2423F /* Pods-RTCP.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = M28B7CT6HR;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		08C380B72564284B0013D0C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DD1A77E6C714A75C93A93BB8 /* Pods-RTCPApi.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M28B7CT6HR;
@@ -259,8 +531,9 @@
 			};
 			name = Debug;
 		};
-		08E03E9D25472A3700051E85 /* Release */ = {
+		08C380B82564284B0013D0C7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EEDA46FCB801F2444D4098B6 /* Pods-RTCPApi.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M28B7CT6HR;
@@ -272,28 +545,72 @@
 			};
 			name = Release;
 		};
+		08C380C42564285C0013D0C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 858F9CCAE51EC9C811698D9B /* Pods-RTCPExt.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = M28B7CT6HR;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		08C380C52564285C0013D0C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6457BD58FB1EC35DBE3C67FE /* Pods-RTCPExt.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = M28B7CT6HR;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		08E03E8F25472A3700051E85 /* Build configuration list for PBXProject "RTCP" */ = {
+		08C3809E256428360013D0C7 /* Build configuration list for PBXProject "RTCP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				08E03E9925472A3700051E85 /* Debug */,
-				08E03E9A25472A3700051E85 /* Release */,
+				08C380A8256428360013D0C7 /* Debug */,
+				08C380A9256428360013D0C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		08E03E9B25472A3700051E85 /* Build configuration list for PBXNativeTarget "RTCP" */ = {
+		08C380AA256428360013D0C7 /* Build configuration list for PBXNativeTarget "RTCP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				08E03E9C25472A3700051E85 /* Debug */,
-				08E03E9D25472A3700051E85 /* Release */,
+				08C380AB256428360013D0C7 /* Debug */,
+				08C380AC256428360013D0C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08C380B62564284B0013D0C7 /* Build configuration list for PBXNativeTarget "RTCPApi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08C380B72564284B0013D0C7 /* Debug */,
+				08C380B82564284B0013D0C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08C380C32564285C0013D0C7 /* Build configuration list for PBXNativeTarget "RTCPExt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08C380C42564285C0013D0C7 /* Debug */,
+				08C380C52564285C0013D0C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 08E03E8C25472A3700051E85 /* Project object */;
+	rootObject = 08C3809B256428360013D0C7 /* Project object */;
 }

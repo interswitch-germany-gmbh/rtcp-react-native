@@ -103,3 +103,8 @@ iOSInjectionProject/
 
 # macOS
 .DS_Store
+
+# pod developement
+Podfile
+Podfile.lock
+Pods

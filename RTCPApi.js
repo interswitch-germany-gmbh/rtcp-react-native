@@ -1,6 +1,9 @@
 class RTCPApi {
+    logPrefix = "[RTCP Api]";
+
     // constants
-    RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/";
+    //RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/";
+    RTCP_BASE_URL_TEST = "http://192.168.178.37:3000/api/";
     RTCP_BASE_URL_PROD = "https://rtcp.vanso.com/api/";
 
     // add possibility to easily override console.log
@@ -12,7 +15,7 @@ class RTCPApi {
     appID = "";
 
     // register device with RTCP (devices/register_device)
-    async register(device) {
+    async registerDevice(device) {
         try {
             this.log("Registering with RTCP Server, hardware_id:", device.hardware_id);
             const response = await fetch(this.baseUrl + "devices/register_device", {
@@ -52,7 +55,30 @@ class RTCPApi {
             }
             return true;
         } catch (error) {
-            this.log("Error updating remote status: ", error);
+            this.log("Error updating remote status:", error);
+            return false;
+        }
+    }
+
+    // get the most recent notifications from server
+    async getRecentNotifications(hardware_id, count) {
+        try {
+            this.log("Getting recent notifications from RTCP Server");
+            const response = await fetch(this.baseUrl + "notifications/recent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": this.appID },
+                body: JSON.stringify({
+                    hardware_id: hardware_id,
+                    count: count
+                })
+            });
+            let res = await response.json();
+            if (!response.ok || !res.processed) {
+                throw "Received non-ok response from RTCP";
+            }
+            return res.notifications || [];
+        } catch (error) {
+            this.log("Error getting recent notifications:", error);
             return false;
         }
     }
