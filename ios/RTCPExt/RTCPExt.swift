@@ -45,7 +45,8 @@ public class RTCPExt {
                 }
 
                 if let inboxJSON = userDefaults.string(forKey: "rtcp_inbox"),                                // load inbox from userdefaults
-                   var inbox = try? JSONSerialization.jsonObject(with: Data(inboxJSON.utf8)) as? [Any] {     // JSON parse inbox
+                   let _inbox = try? JSONSerialization.jsonObject(with: Data(inboxJSON.utf8)) as? [Any],     // JSON parse inbox
+                   var inbox = _inbox {                                                                      // unwrap inbox
 
                     let inboxSize = Int(userDefaults.string(forKey: "rtcp_inbox_size") ?? "25") ?? 25        // get inbox size limit
 
@@ -77,8 +78,6 @@ public class RTCPExt {
 
                 // add info that push notification has been processed by NSE
                 bestAttemptContent.userInfo.updateValue("true", forKey: "rtcp_nse_processed")
-
-                bestAttemptContent.title = "\(bestAttemptContent.title) [v4]"
                 contentHandler(bestAttemptContent)
             }
 

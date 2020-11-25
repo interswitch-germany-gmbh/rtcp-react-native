@@ -79,7 +79,7 @@ class RTCPApi {
             return res.notifications || [];
         } catch (error) {
             this.log("Error getting recent notifications:", error);
-            return false;
+            throw "Error getting recent notifications:";
         }
     }
 }
