@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.source         = { http: package['repository'] }
 
   s.platform       = :ios, '10.0'
+  s.swift_version  = '5.0'
 
   s.preserve_paths = 'LICENSE', 'package.json', 'index.js'
 
