@@ -45,9 +45,8 @@ public class RTCPExt {
                 }
 
                 if let inboxJSON = userDefaults.string(forKey: "rtcp_inbox"),                                // load inbox from userdefaults
-                   let _inbox = try? JSONSerialization.jsonObject(with: Data(inboxJSON.utf8)) as? [Any],     // JSON parse inbox
-                   var inbox = _inbox {                                                                      // unwrap inbox
-
+                   let _inbox = try? JSONSerialization.jsonObject(with: Data(inboxJSON.utf8)),               // JSON parse inbox
+                   var inbox = _inbox as? [Any] {                                                            // unwrap inbox
                     let inboxSize = Int(userDefaults.string(forKey: "rtcp_inbox_size") ?? "25") ?? 25        // get inbox size limit
 
                     // --- ADD MESSAGE TO INBOX ---
