@@ -8,7 +8,6 @@
   - [Android Setup](#android-setup)
   - [iOS Setup](#ios-setup)
 - [Usage](#usage)
-  - [Core Module](#core-module)
 - [Reference - Core Module](#reference---core-module)
   - [Configuration](#configuration)
   - [Methods](#methods)
@@ -28,7 +27,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
 - React-Native >= 0.60
 - iOS:
   - iOS >= 10  
-    Why: with iOS 10 notification handling has been majorly reworked by Apple
+    Why: with iOS 10 notification handling has been majorly reworked by Apple to e.g. support media attachments
   - Cocoapods
   - Compilation of Swift code. If your app does not contain any Swift code, add an empty dummy Swift file to enable.
 
@@ -58,7 +57,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
 Set up your app for use with Google Firebase Cloud Messaging. See the [official documentation](https://firebase.google.com/docs/cloud-messaging/android/client) on how to do this. Here's a short summary:
 
-- Sign in to [Firebase Console](console.firebase.google.com), create a Firebase project and register your app.
+- If not done for your app already, sign in to [Firebase Console](console.firebase.google.com), create a Firebase project and register your app.
 - Download the `google-services.json` file and put it into the folder `/android/app/` of your React Native app.
 - Follow the Gradle instructions to integrate the Firebase SDK
   - Add the Google Services Gradle plugin to your app
@@ -258,18 +257,16 @@ In order to enable extended features like Rich Push and Delivery Status you need
 
 ## Usage
 
-### Core Module
-
 Import and initialize the core module in your application's main file:
 
-> ❗ Make sure to initialize this module **outside of any component** (even `App`) or handlers will not be triggered correctly. Best is to do this at the top level of your main application file.
+> ❗ Make sure to initialize this module **before you register your root component with** `AppRegistry.registerComponent('Appname', () => App);`!
 
 ```javascript
 import RTCP from 'rtcp-react-native';
 
 // do this outside of any component
 RTCP.init({
-  appID: '1234567890abcdef' // <-- mandatory parameter
+  appID: '1234567890abcdef', // <-- mandatory parameter
   production: false
 });
 ```
@@ -301,7 +298,27 @@ RTCP.registerEventHandler("onNotificationTapped", (notification) => {
 });
 ```
 
-When using the Inbox Module, nothing else is usually required from the Core Module. 
+Here is a sample notification object:
+
+```js
+{
+  id: undefined,
+  title: 'Notification title',
+  message: 'Notification message',
+  foreground: true,
+  userInteraction: false,
+  data:
+   { remote: true,
+     notificationId: 'B207A529-FFCC-48A0-8593-72B96C424C14',
+     push_id: 'P1234',
+     app_data: <custom rtcp push payload> },
+  badge: undefined,
+  soundName: 'default',
+  finish: [Function: finish]
+}
+```
+
+When using the Inbox Module, nothing else is usually required from the Core Module.
 
 Integration of the inbox into your React Native screen can be done like this:
 
@@ -352,7 +369,7 @@ async function init(options)
 
 Initializes the rtcp-react-native module with the provided `options`.
 Besides general module configuration, this sets up your app to receive push notifications and registers your device with RTCP.  
-This method needs to be called outside of any component (even `App`)!  
+This method needs to be called before you register your root component with `AppRegistry.registerComponent('Appname', () => App);`!
 
 *Parameters*  
 
@@ -391,7 +408,7 @@ Throws an error if the request failed.
 function registerEventHandler(event, handler)
 ```
 
-Register a `handler` function to be called when `event` is emitted.  
+Register a `handler` function to be called when `event` is emitted. For a list of possible events see below.
 
 *Parameters*
 
@@ -403,7 +420,7 @@ Register a `handler` function to be called when `event` is emitted.
 function unregisterEventHandler(event, handler)
 ```
 
-Removes a `handler` function from the `event` list.  
+Removes a `handler` function from the `event` list.
 
 *Parameters*
 
@@ -411,6 +428,9 @@ Removes a `handler` function from the `event` list.
 - `handler` *`(Function)`* - function to be removed<br /><br />
 
 ### Events
+
+- **`"onRegister"`**  
+  Emitted when the app has successfully been registered with the RTCP server.
 
 - **`"onRemoteNotification": (notification)`**  
   Emitted when a push notification is received from the RTCP server.  
@@ -421,9 +441,6 @@ Removes a `handler` function from the `event` list.
   Emitted when the app is opened by the user having tapped a notification in the OS's notification center.  
   *Function parameters*  
   - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
-
-- **`"onRegister"`**  
-  Emitted when the app has successfully been registered with the RTCP server.
 
 ## Reference - Inbox Module
 
@@ -497,7 +514,7 @@ To reduce server requests and load, these updates are queued up and send either 
 function registerEventHandler(event, handler)
 ```
 
-Register a `handler` function to be called when `event` is emitted.  
+Register a `handler` function to be called when `event` is emitted. For a list of possible events see below.
 
 *Parameters*
 
@@ -509,7 +526,7 @@ Register a `handler` function to be called when `event` is emitted.
 function unregisterEventHandler(event, handler)
 ```
 
-Removes a `handler` function from the `event` list.  
+Removes a `handler` function from the `event` list.
 
 *Parameters*
 
@@ -542,7 +559,6 @@ export default class Notifications extends Component {
       notifications: [],
       refreshing: false
     };
-    this.updateInbox = this.updateInbox.bind(this);
   }
 
   componentDidMount() {
@@ -554,11 +570,11 @@ export default class Notifications extends Component {
     RTCPInbox.unregisterEventHandler("onInboxUpdate", this.updateInbox);
   }
 
-  updateInbox(inbox) {
+  updateInbox = (inbox) => {
     this.setState({notifications: inbox});
   }
   
-  onRefresh() {
+  onRefresh = () => {
     this.setState({refreshing:true}, async () => {
       try {
         await RTCPInbox.syncInbox(true);
@@ -571,7 +587,7 @@ export default class Notifications extends Component {
 
   onViewableItemsChanged = ({viewableItems, changed}) => {
     viewableItems.forEach(item => {
-      if (item["item"]["read"] === false) RTCPInbox.setRead(item["index"]);
+      if (item.item?.read === false) RTCPInbox.setRead(item.index);
     });
   }
 
@@ -595,7 +611,7 @@ export default class Notifications extends Component {
         keyExtractor={(item) => item.push_id}
         ListEmptyComponent={<Text style={{textAlign: 'center'}}>You have no notifications</Text>}
         refreshing={this.state.refreshing}
-        onRefresh={() => this.onRefresh()}
+        onRefresh={this.onRefresh}
         viewabilityConfig = {{
           minimumViewTime: 1000,
           itemVisiblePercentThreshold: 90,
