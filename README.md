@@ -29,7 +29,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
   - iOS >= 10  
     Why: with iOS 10 notification handling has been majorly reworked by Apple to e.g. support media attachments
   - Cocoapods
-  - Compilation of Swift code. If your app does not contain any Swift code, add an empty dummy Swift file to enable.
+  - Compilation of Swift code. If your app fails compiling with errors like "Could not find auto-linked library 'swiftFoundation'", add an empty dummy Swift file (see [here](https://stackoverflow.com/a/54586937/12079891) for instructions).
 
 ## Installation
 
@@ -47,10 +47,10 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  yarn add react-native-device-info https://github.com/vanso-hubsi/react-native-push-notification.git react-native-default-preference @react-native-community/push-notification-ios
 
   # using npm
-  npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  npm install react-native-device-info https://github.com/vanso-hubsi/react-native-push-notification.git react-native-default-preference @react-native-community/push-notification-ios
   ```
 
 ### Android Setup
@@ -318,6 +318,14 @@ Here is a sample notification object:
 }
 ```
 
+The Core Module copies all methods from `react-native-push-notification`, so all functions listed [there](https://github.com/zo0r/react-native-push-notification#local-notifications) can be used directly. Example:
+
+```js
+import RTCP from 'rtcp-react-native';
+
+RTCP.removeAllDeliveredNotifications();
+```
+
 When using the Inbox Module, nothing else is usually required from the Core Module.
 
 Integration of the inbox into your React Native screen can be done like this:
@@ -352,8 +360,11 @@ Whether to connect to RTCP Staging or Production
 * **`enableLogging`** *`(Boolean) - optional, default: true`*  
 If true, log actions to console.log.
 
-* **`clearOnStart`** *`(Boolean) - optional, default: true`*  
+* **`clearOnStart`** *`(Boolean) - optional, default: false`*  
 Remove all notifications from the OS's notification center when the app is opened.
+
+* **`clearAfter`** *`(Number) - optional, default: 2000`*  
+Time in milliseconds after which to run `clearOnStart` if enabled.
 
 * **`channelName`** *`(String) - optional, default: "Push Notifications" - Android only`*  
 Currently, RTCP only supports one single notification channel for Android. You can define the name of that notification channel as is appears in Androids Notification Settings for your app

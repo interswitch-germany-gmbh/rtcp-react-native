@@ -63,6 +63,17 @@ class RTCPInbox extends RTCPEvents {
 
     async syncInbox(force = false) {
         if (force || new Date() - this._lastInboxSync > SYNCTIMEOUT * 1000) {
+
+            // send outstanding read receipts to server before syncing inbox
+            if (this._readReceiptQueue.length != 0) {
+                this._startReadReceiptTimer(0);
+                let tenthsOfSecond = 0;
+                while (this._readReceiptQueue.length != 0 || tenthsOfSecond <= 10) {  // wait max of 1 second for read receipt queue to clear
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    tenthsOfSecond++;
+                }
+            }
+
             this._inbox = (await RTCP.getRecentNotifications(this.inboxSize)) || this._inbox; // get inbox from server, throws on error
             this._lastInboxSync = new Date(); // note sync time
             await this._writeInboxToStorage(); // store inbox and sync time
@@ -171,8 +182,8 @@ class RTCPInbox extends RTCPEvents {
         }
 
         // start new timer
-        this._readReceiptTimer = setTimeout(() => {
-            RTCP.sendReadReceipt(this._readReceiptQueue);
+        this._readReceiptTimer = setTimeout(async () => {
+            await RTCP.sendReadReceipt(this._readReceiptQueue);
             this._readReceiptQueue = [];
             this._readReceiptTimer = null;
             AppState.removeEventListener("change", this._sendReceiptsOnAppClose);

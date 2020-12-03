@@ -5,7 +5,6 @@ import PushNotification from "react-native-push-notification";
 import DeviceInfo from "react-native-device-info";
 import { Platform, AppState, Linking } from "react-native";
 import DefaultPreference from "react-native-default-preference";
-import PushNotificationIOS from "@react-native-community/push-notification-ios";
 
 const SDK_VERSION = 2;
 
@@ -23,6 +22,11 @@ class RTCP extends RTCPEvents {
     _events = ["onRemoteNotification", "onNotificationTapped", "onRegister"];
 
     hardware_id = "";
+
+    constructor() {
+        super();
+        Object.assign(this, PushNotification);
+    }
 
     // custom logging - prepend module name in log output
     log() {
@@ -49,10 +53,19 @@ class RTCP extends RTCPEvents {
         RTCPApi.baseurl = production ? RTCPApi.RTCP_BASE_URL_PROD : RTCPApi.RTCP_BASE_URL_TEST;
 
         // clearOnStart: boolean, default: true
-        if (typeof options.clearOnStart !== "undefined" ? options.clearOnStart : true) {
+        this.clearAfter = typeof options.clearAfter !== "undefined" ? options.clearAfter : 2000;
+
+        // clearOnStart: boolean, default: true
+        if (typeof options.clearOnStart !== "undefined" ? options.clearOnStart : false) {
             AppState.addEventListener("change", (nextAppState) => {
                 if (nextAppState === "active") {
-                    PushNotification.removeAllDeliveredNotifications();
+                    this._removeNotificationsTimer = setTimeout(() => {
+                        this.removeAllDeliveredNotifications();
+                        this._removeNotificationsTimer = null;
+                    }, this.clearAfter);
+                } else if (this._removeNotificationsTimer) {
+                    clearTimeout(this._removeNotificationsTimer);
+                    this._removeNotificationsTimer = null;
                 }
             });
         }
@@ -66,7 +79,7 @@ class RTCP extends RTCPEvents {
         this.hardware_id = DeviceInfo.getUniqueId();
 
         // create notification channel (required for Android)
-        PushNotification.createChannel({
+        this.createChannel({
             channelId: "push-channel",
             channelName: typeof options.channelName !== "undefined" ? options.channelName : "Push Notifications",
             soundName: "default",
@@ -75,12 +88,12 @@ class RTCP extends RTCPEvents {
         });
 
         // initialize push notifications module
-        PushNotification.configure({
+        this.configure({
             onRegister: (token) => {
-                this._onRegister(token);
+                this._onRTCPRegister(token);
             },
             onNotification: (notification) => {
-                this._onNotification(notification);
+                this._onRTCPNotification(notification);
             }
         });
 
@@ -107,7 +120,7 @@ class RTCP extends RTCPEvents {
 
     // --- private methods ---
 
-    async _onRegister(token) {
+    async _onRTCPRegister(token) {
         this.log("Registered with FCM/APNs. hardware_id:", this.hardware_id, "token:", token.token);
 
         // check if token has changed. if not, do not register again to reduce server load
@@ -136,7 +149,7 @@ class RTCP extends RTCPEvents {
         }
     }
 
-    async _onNotification(notification) {
+    async _onRTCPNotification(notification) {
         if (notification.userInteraction === false) {
             // received a remote notification
             if (notification.data.app_data) {
@@ -166,6 +179,11 @@ class RTCP extends RTCPEvents {
                 this._handleAndroidNotification(notification.data);
             }
 
+            if (Platform.OS !== "ios" || !data.message) {
+                // update notification's remote status to "received" (on iOS done in NSE, except for silent pushes)
+                if (data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, data.push_id, "received");
+            }
+
             this._emitEvent("onRemoteNotification", notification);
         } else {
             // user tapped notification
@@ -184,12 +202,12 @@ class RTCP extends RTCPEvents {
     _handleAndroidNotification(data) {
         if (data.revoke) {
             const id = this._buildNotificationID(data.revoke);
-            if (id) PushNotification.removeDeliveredNotifications([id]);
+            if (id) this.removeDeliveredNotifications([id]);
         } else if (data.message) {  // only show notification if a message is available
             // native call freezes object for later use (e.g. callbacks), create a copy
             data = JSON.parse(JSON.stringify(data));
 
-            PushNotification.localNotification({
+            this.localNotification({
                 id: this._buildNotificationID(data.replace ? data.replace : data.push_id), // replace existing notification if requested
                 channelId: "push-channel",
                 title: data.title && data.title !== data.message ? data.title : null, // don't show a title if it's the same as the message (old RTCP behaviour)
@@ -200,9 +218,6 @@ class RTCP extends RTCPEvents {
                 bigLargeIconUrl: data.big_large_icon_url || null
             });
         }
-
-        // update notification's remote status to "received" (on iOS done in NSE)
-        if (data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, data.push_id, "received");
     }
 
     // --- helper functions ---
