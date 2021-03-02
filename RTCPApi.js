@@ -2,8 +2,7 @@ class RTCPApi {
     logPrefix = "[RTCP Api]";
 
     // constants
-    //RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/";
-    RTCP_BASE_URL_TEST = "http://192.168.178.37:3000/api/";
+    RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/";
     RTCP_BASE_URL_PROD = "https://rtcp.vanso.com/api/";
 
     // add possibility to easily override console.log
