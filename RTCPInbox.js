@@ -30,7 +30,12 @@ class RTCPInbox extends RTCPEvents {
         // enableBadge
         this.enableBadge = typeof options.enableBadge !== "undefined" ? options.enableBadge : true;
         if (Platform.OS === "ios") await DefaultPreference.set("rtcp_enable_badge", this.enableBadge.toString()); // store in userdefaults for NSE
-        if (this.enableBadge) this.registerEventHandler("onInboxUpdate", () => PushNotification.setApplicationIconBadgeNumber(this.getUnreadCount()));
+
+        // update badge and write inbox to storage on changes
+        if (this.enableBadge) this.registerEventHandler("onInboxUpdate", () => {
+          PushNotification.setApplicationIconBadgeNumber(this.getUnreadCount());
+          this._writeInboxToStorage();
+        });
 
         // inboxSize
         this.inboxSize = typeof options.inboxSize !== "undefined" ? options.inboxSize : DEFAULTINBOXSIZE;
@@ -76,7 +81,6 @@ class RTCPInbox extends RTCPEvents {
 
             this._inbox = (await RTCP.getRecentNotifications(this.inboxSize)) || this._inbox; // get inbox from server, throws on error
             this._lastInboxSync = new Date(); // note sync time
-            await this._writeInboxToStorage(); // store inbox and sync time
             this._emitEvent("onInboxUpdate", this._inbox); // emit update event
         } else {
             this.log("Time since last sync too short. Not syncing Inbox with server");
@@ -99,7 +103,6 @@ class RTCPInbox extends RTCPEvents {
             this._readReceiptQueue.indexOf(this._inbox[index]["push_id"]) === -1 && this._readReceiptQueue.push(this._inbox[index]["push_id"]);
             this._startReadReceiptTimer(READRECEIPTWAITTIME);
 
-            this._writeInboxToStorage();
             this._emitEvent("onInboxUpdate", this._inbox);
         }
     }
@@ -159,11 +162,11 @@ class RTCPInbox extends RTCPEvents {
         if (inboxString) {
             this._inbox = JSON.parse(inboxString);
             this._lastInboxSync = new Date(await DefaultPreference.get("rtcp_last_inbox_sync"));
+            this._emitEvent("onInboxUpdate", this._inbox);
         } else {
-            this._writeInboxToStorage();
+            // inbox storage has not been initialized yet. Get messages from server in case this is a re-install
+            this.syncInbox().catch(() => {});
         }
-
-        this._emitEvent("onInboxUpdate", this._inbox);
     }
 
     async _writeInboxToStorage() {
