@@ -179,9 +179,9 @@ class RTCP extends RTCPEvents {
                 this._handleAndroidNotification(notification.data);
             }
 
-            if (Platform.OS !== "ios" || !data.message) {
+            if (Platform.OS !== "ios" || !notification.data.message) {
                 // update notification's remote status to "received" (on iOS done in NSE, except for silent pushes)
-                if (data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, data.push_id, "received");
+                if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "received");
             }
 
             this._emitEvent("onRemoteNotification", notification);
