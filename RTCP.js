@@ -50,7 +50,7 @@ class RTCP extends RTCPEvents {
 
         // production: boolean, default: false
         let production = typeof options.production !== "undefined" ? options.production : false;
-        RTCPApi.baseurl = production ? RTCPApi.RTCP_BASE_URL_PROD : RTCPApi.RTCP_BASE_URL_TEST;
+        RTCPApi.baseUrl = production ? RTCPApi.RTCP_BASE_URL_PROD : RTCPApi.RTCP_BASE_URL_TEST;
 
         // clearOnStart: boolean, default: true
         this.clearAfter = typeof options.clearAfter !== "undefined" ? options.clearAfter : 2000;
