@@ -15,6 +15,7 @@ class RTCPInbox extends RTCPEvents {
     log = RTCP.log; // use logger of main module
 
     _inbox = []; // initialize empty inbox
+    _inboxReady = false; // to be able to wait for inbox to be loaded on app start
     _lastInboxSync = new Date(0); // timestamp of last inbox sync with server
 
     _readReceiptQueue = []; // array of push_ids to send read receipt to server for
@@ -62,7 +63,6 @@ class RTCPInbox extends RTCPEvents {
 
 
         // --- Initializations ---
-
         RTCP.registerEventHandler("onRemoteNotification", (notification) => this._onRemoteNotification(notification));
     }
 
@@ -81,6 +81,7 @@ class RTCPInbox extends RTCPEvents {
 
             this._inbox = (await RTCP.getRecentNotifications(this.inboxSize)) || this._inbox; // get inbox from server, throws on error
             this._lastInboxSync = new Date(); // note sync time
+            this._inboxReady = true;
             this._emitEvent("onInboxUpdate", this._inbox); // emit update event
         } else {
             this.log("Time since last sync too short. Not syncing Inbox with server");
@@ -109,9 +110,12 @@ class RTCPInbox extends RTCPEvents {
 
     // --- private methods ---
 
-    _onRemoteNotification(notification) {
+    async _onRemoteNotification(notification) {
         // on Android manage inbox on incoming message
         if (Platform.OS === "android") {
+            if (!this._inboxReady) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
             let data = notification.data;
 
             if (data.revoke || (data.message && !data.not_in_inbox)) {
@@ -162,6 +166,7 @@ class RTCPInbox extends RTCPEvents {
         if (inboxString) {
             this._inbox = JSON.parse(inboxString);
             this._lastInboxSync = new Date(await DefaultPreference.get("rtcp_last_inbox_sync"));
+            this._inboxReady = true;
             this._emitEvent("onInboxUpdate", this._inbox);
         } else {
             // inbox storage has not been initialized yet. Get messages from server in case this is a re-install

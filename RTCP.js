@@ -158,6 +158,11 @@ class RTCP extends RTCPEvents {
                     notification.data.app_data = JSON.parse(notification.data.app_data);
                 }
 
+                // remove title if it's the same as the message (old RTCP behaviour)
+                if (notification.data.title && notification.data.title === notification.data.message) {
+                    notification.data.title = null;
+                }
+
                 // compatibility to old RTCP payload when push_id was in app_data
                 if (notification.data.app_data.push_id) {
                     if (!notification.data.push_id) notification.data.push_id = notification.data.app_data.push_id;
@@ -210,7 +215,7 @@ class RTCP extends RTCPEvents {
             this.localNotification({
                 id: this._buildNotificationID(data.replace ? data.replace : data.push_id), // replace existing notification if requested
                 channelId: "push-channel",
-                title: data.title && data.title !== data.message ? data.title : null, // don't show a title if it's the same as the message (old RTCP behaviour)
+                title: data.title,
                 message: data.message,
                 userInfo: data, // "userInfo" will be in "data" when notification is tapped
                 bigPictureUrl: data.media_url || null,
