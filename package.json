@@ -1,6 +1,6 @@
 {
   "name": "rtcp-react-native",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "React Native module for integration with RTCP",
   "main": "RTCP.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "peerDependencies": {
     "react-native": ">= 0.60",
     "react-native-device-info": ">= 6.0.0",
-    "react-native-push-notification": ">= 6.0.0",
+    "react-native-push-notification": ">= 7.0.0",
     "react-native-default-preference": "^1.4.3"
   }
 }

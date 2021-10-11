@@ -266,8 +266,8 @@ import RTCP from 'rtcp-react-native';
 
 // do this outside of any component
 RTCP.init({
-  appID: '1234567890abcdef', // <-- mandatory parameter
-  production: false
+  appID: __DEV__ ? '1234567890abcdef' : 'fedcba0987654321', // <-- mandatory parameter
+  production: !__DEV__
 });
 ```
 
@@ -278,7 +278,8 @@ import RTCP from 'rtcp-react-native';
 import RTCPInbox from 'rtcp-react-native/RTCPInbox';
 
 RTCP.init({
-  appID: '1234567890abcdef'
+  appID: __DEV__ ? '1234567890abcdef' : 'fedcba0987654321',
+  production: !__DEV__,
   // ... possibly more options
 }).then(() =>
   RTCPInbox.init({

@@ -6,7 +6,7 @@ import DeviceInfo from "react-native-device-info";
 import { Platform, AppState, Linking } from "react-native";
 import DefaultPreference from "react-native-default-preference";
 
-const SDK_VERSION = 2;
+import { version as SDK_VERSION } from "./package.json";
 
 const DEVICE_TYPE_MAP = {
     Handset: "phone",
@@ -123,29 +123,29 @@ class RTCP extends RTCPEvents {
     async _onRTCPRegister(token) {
         this.log("Registered with FCM/APNs. hardware_id:", this.hardware_id, "token:", token.token);
 
-        // check if token has changed. if not, do not register again to reduce server load
-        const storedToken = await DefaultPreference.get("rtcp_push_token");
-        if (storedToken === null || storedToken !== token.token) {
-            // create device registration data
-            let device = {
-                hardware_id: this.hardware_id,
-                push_token: token.token,
-                platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
-                device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
-                api_version: "2",
-                sdk_version: SDK_VERSION,
-                tags: { app_version: DeviceInfo.getVersion() }
-                // TODO: add more values (configurable)
-            };
+        // create device registration data
+        let device = {
+            hardware_id: this.hardware_id,
+            push_token: token.token,
+            platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
+            device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
+            api_version: "2",
+            sdk_version: SDK_VERSION,
+            tags: { app_version: DeviceInfo.getVersion() }
+        };
+        let deviceJson = JSON.stringify(device);
 
+        // check if registration data has changed. if not, do not register again to reduce server load
+        const registeredDevice = await DefaultPreference.get("rtcp_device");
+        if (registeredDevice === null || registeredDevice !== deviceJson) {
             // send registration to RTCP
             if (await RTCPApi.registerDevice(device)) {
-                // store token for later comparison
-                await DefaultPreference.set("rtcp_push_token", token.token);
+                // store device data for later comparison
+                await DefaultPreference.set("rtcp_device", deviceJson);
                 this._emitEvent("onRegister");
             }
         } else {
-            this.log("Token is unchanged, not sending registration to RTCP Server");
+            this.log("Device data and token are unchanged, not sending registration to RTCP Server");
         }
     }
 
