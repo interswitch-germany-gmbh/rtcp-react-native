@@ -6,6 +6,8 @@ import DeviceInfo from "react-native-device-info";
 import { Platform, AppState, Linking } from "react-native";
 import DefaultPreference from "react-native-default-preference";
 
+import { DeviceEventEmitter } from 'react-native';
+
 import { version as SDK_VERSION } from "./package.json";
 
 const DEVICE_TYPE_MAP = {
@@ -72,6 +74,9 @@ class RTCP extends RTCPEvents {
 
         // openURL: boolean, default: true
         this.openURL = typeof options.openURL !== "undefined" ? options.openURL : true;
+
+        // deepLinking: boolean, default: true
+        this.deepLinking = typeof options.deepLinking !== "undefined" ? options.deepLinking : true;
 
         // --- Initializations ---
 
@@ -195,6 +200,10 @@ class RTCP extends RTCPEvents {
             this.log("User tapped notification: ", notification);
 
             this._emitEvent("onNotificationTapped", notification);
+
+            if (this.deepLinking && notification.data.deeplink) {
+                DeviceEventEmitter.emit('url', { url: notification.data.deeplink });
+            }
 
             if (notification.data.url && this.openURL) {
                 if (await Linking.canOpenURL(notification.data.url)) {

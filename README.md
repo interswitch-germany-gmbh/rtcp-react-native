@@ -8,6 +8,8 @@
   - [Android Setup](#android-setup)
   - [iOS Setup](#ios-setup)
 - [Usage](#usage)
+  - [Deep Linking](#deep-linking)
+  - [Inbox Module](#inbox-module)
 - [Reference - Core Module](#reference---core-module)
   - [Configuration](#configuration)
   - [Methods](#methods)
@@ -33,24 +35,24 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
 ## Installation
 
-- Add the module to your React Native app (as yet requires access to the private repository):
+- Add the module to your React Native app:
 
   ```sh
   # using yarn
-  yarn add https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  yarn add https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
 
   # using npm
-  npm install https://<your_organization_user>@github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  npm install https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
   ```
 
 - Add all required peerDependencies:
 
   ```sh
   # using yarn
-  yarn add react-native-device-info https://github.com/vanso-hubsi/react-native-push-notification.git react-native-default-preference @react-native-community/push-notification-ios
+  yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
 
   # using npm
-  npm install react-native-device-info https://github.com/vanso-hubsi/react-native-push-notification.git react-native-default-preference @react-native-community/push-notification-ios
+  npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
   ```
 
 ### Android Setup
@@ -327,6 +329,16 @@ import RTCP from 'rtcp-react-native';
 RTCP.removeAllDeliveredNotifications();
 ```
 
+### Deep Linking
+
+Deep Linking is enabled by default and can be disabled via the init parameter `deepLinking`.
+
+When a notification containing a Deep Link is tapped, the `'url'` event is emitted the same way React Native's `Linking` class does when the app is opened via Deep Linking. 
+
+If Deep Linking is set up in `react-navigation`, it listens to this event by default. Therefore, it will behave just like when a Deep Link is opened from a browser with no extra code being required.
+
+### Inbox Module
+
 When using the Inbox Module, nothing else is usually required from the Core Module.
 
 Integration of the inbox into your React Native screen can be done like this:
@@ -372,6 +384,10 @@ Currently, RTCP only supports one single notification channel for Android. You c
 
 * **`openURL`** *`(Boolean) - optional, default: true`*  
 Open URLs attached to the notification when the user opened the app by tapping the notification (uses `Linking.openURL()`).
+
+* **`deepLinking`** *`(Boolean) - optional, default: true`*  
+Handle Deep Links when a user taps a notification with a Deep Link attached (i.e. emit `'url'` event).
+
 
 ### Methods
 
