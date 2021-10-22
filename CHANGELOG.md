@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 / 2021-10-22
+
+* Add support to delete notifications from the inbox
+* Add Inbox Component for easier integration (`RTCPInboxList`)
+
 ## 1.1.0 / 2021-10-14
 
 * Add support for Deep Linking

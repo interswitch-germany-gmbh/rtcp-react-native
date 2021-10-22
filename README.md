@@ -45,7 +45,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
   npm install https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
   ```
 
-- Add all required peerDependencies:
+- Add all required peerDependencies, as they're not installed automatically:
 
   ```sh
   # using yarn
@@ -417,6 +417,17 @@ Throws an error if the request failed.
 
 
 ```js
+async function deleteNotification(push_id)
+```
+
+Remove push notification `push_id` from the inbox on the RTCP server.  
+
+*Parameters*  
+
+- `push_id` *`(String)`* - push_id to delete on server<br /><br />
+
+
+```js
 async function getRecentNotifications(count = 10)
 ```
 
@@ -537,6 +548,16 @@ To reduce server requests and load, these updates are queued up and send either 
 *Parameters*
 
 - `index` *`(Number)`* - inbox array index of notification to update<br /><br />
+
+```js
+function delete(index)
+```
+
+Remove the notification at `index` from the local inbox storage and send a request to also delete from the server's inbox.
+
+*Parameters*
+
+- `index` *`(Number)`* - inbox array index of notification to delete<br /><br />
 
 ```js
 function registerEventHandler(event, handler)

@@ -81,6 +81,28 @@ class RTCPApi {
             throw "Error getting recent notifications:";
         }
     }
+
+    async deleteNotification(hardware_id, push_id) {
+        try {
+            this.log('Deleting notification from server with ID ' + push_id);
+            const response = await fetch(this.baseUrl + "notifications/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": this.appID },
+                body: JSON.stringify({
+                    hardware_id: hardware_id,
+                    push_id: push_id
+                })
+            });
+            if (!response.ok || !(await response.json()).processed) {
+                throw "Received non-ok response from RTCP";
+            }
+            return true;
+        } catch (error) {
+            this.log("Error deleting notification from server:", error);
+            return false;
+        }
+
+    }
 }
 
 export default new RTCPApi();

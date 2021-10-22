@@ -108,6 +108,14 @@ class RTCPInbox extends RTCPEvents {
         }
     }
 
+    delete(index) {
+        if (this._inbox[index]) {
+            RTCP.deleteNotification(this._inbox[index]["push_id"]);
+            this._inbox.splice(index, 1);
+            this._emitEvent("onInboxUpdate", this._inbox);
+        }
+    }
+
     // --- private methods ---
 
     async _onRemoteNotification(notification) {

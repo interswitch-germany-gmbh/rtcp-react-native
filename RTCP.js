@@ -123,6 +123,10 @@ class RTCP extends RTCPEvents {
         return RTCPApi.getRecentNotifications(this.hardware_id, count);
     }
 
+    async deleteNotification(push_id) {
+        RTCPApi.deleteNotification(this.hardware_id, push_id);
+    }
+
     // --- private methods ---
 
     async _onRTCPRegister(token) {
