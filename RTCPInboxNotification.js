@@ -1,6 +1,8 @@
 import React, { PureComponent } from "react";
 import { View, Text, Image, Modal, Linking, TouchableOpacity, TouchableHighlight, StyleSheet } from "react-native";
 
+import defaultStyles from "./styles"
+
 export class RTCPInboxNotification extends PureComponent {
     constructor(props) {
         super(props);
@@ -40,7 +42,7 @@ export class RTCPInboxNotification extends PureComponent {
                                     <View>
                                         <Image source={{uri: item.image}} style={[defaultStyles.fsImage, this.props.styles?.fsImage]} />
                                         <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => { this.setFsImageVisible(false) }}>
-                                            <Text style={{color: 'purple', padding: 10}}>❮ Back</Text>
+                                            <Text style={{color: 'black', padding: 10}}>❮ Back</Text>
                                         </TouchableOpacity>
                                     </View>
                                 }
@@ -72,72 +74,5 @@ export class RTCPInboxNotificationBack extends PureComponent {
                 </TouchableOpacity>
             </View>
         )
-    }
-}
-
-const defaultStyles = {
-    notification: {
-        fontWeight: 'bold',
-        backgroundColor: 'white',
-        paddingVertical: 20,
-        paddingHorizontal: 20,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        marginBottom: StyleSheet.hairlineWidth,
-        borderBottomColor: '#999',
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    notificationUnread: {
-    },
-    header: {
-        fontSize: 10,
-        marginBottom: 5
-    },
-    headerUnread: {
-        fontWeight: 'bold'
-    },
-    title: {
-        fontSize: 16
-    },
-    titleUnread: {
-        fontWeight: 'bold'
-    },
-    message: {
-    },
-    messageUnread: {
-        fontWeight: 'bold'
-    },
-    image: {
-        width: 50,
-        height: 50,
-        marginLeft: 10,
-        borderRadius: 3,
-        resizeMode: 'cover'
-    },
-    fsImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'contain'
-    },
-    link: {
-        color: 'darkblue',
-        fontSize: 12,
-        marginTop: 5
-    },
-    hiddenItem: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-end'
-    },
-    deleteView: {
-        flex: 1,
-        marginBottom: StyleSheet.hairlineWidth,
-        width: 75,
-        backgroundColor: 'red',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    deleteText: {
-        color: 'white'
     }
 }

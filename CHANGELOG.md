@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 / 2021-10-25
+
+* Add documentation and example for `RTCPInboxList` component
+
 ## 1.2.0 / 2021-10-22
 
 * Add support to delete notifications from the inbox

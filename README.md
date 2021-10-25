@@ -10,6 +10,8 @@
 - [Usage](#usage)
   - [Deep Linking](#deep-linking)
   - [Inbox Module](#inbox-module)
+  - [Inbox List Component](#inbox-list-component)
+    - [Customization](#customization)
 - [Reference - Core Module](#reference---core-module)
   - [Configuration](#configuration)
   - [Methods](#methods)
@@ -18,7 +20,10 @@
   - [Configuration](#configuration-1)
   - [Methods](#methods-1)
   - [Events](#events-1)
-- [Example](#example)
+- [Reference - Inbox Component](#reference---inbox-component)
+  - [RTCPInboxList](#rtcpinboxlist)
+  - [RTCPNotification](#rtcpnotification)
+  - [RTCPNotificationBack](#rtcpnotificationback)
 
 ## About
 
@@ -45,7 +50,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
   npm install https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
   ```
 
-- Add all required peerDependencies, as they're not installed automatically:
+- Add all required peerDependencies, as they're not installed automatically ([why?](https://github.com/react-native-community/cli/issues/914#issuecomment-574759432)):
 
   ```sh
   # using yarn
@@ -358,7 +363,106 @@ updateInbox(inbox) {
 }
 ```
 
-For a full example Inbox screen featuring pull-to-refresh and automatic read state see the example at the end.
+Though, instead of writing your own Component, we actually recommend using the shipped Inbox List Component below.
+
+### Inbox List Component
+
+`rtcp-react-native` ships with a ready-to-use list component called `RTCPInboxList` that can be integrated easily in your Inbox screen:
+
+```jsx
+import { RTCPInboxList } from "rtcp-react-native/RTCPInboxList";
+
+export default class Notifications extends Component {
+  render() {
+    return (
+      <View>
+        <Text style={styles.myheader}>Notifications</Text>
+        <RTCPInboxList />
+      </View>
+    )
+  }
+}
+```
+
+`RTCPInboxList` is based on [`SwipeListView`](https://github.com/jemise111/react-native-swipe-list-view#readme) and [`FlatList`](https://reactnative.dev/docs/flatlist). `RTCPInboxList` sets a few of their props which can be overridden by providing them as props to `RTCPInboxList`.
+For the list's `renderItem` a custom component called `RTCPInboxNotification` is provided. The default `renderHiddenItem` is `RTCPInboxNotificationBack`. All provided props are forwarded to these two components, i.e. all props of `RTCPNotification` and `RTCPNotificationBack` can also be provided through `RTCPInboxList`.
+
+#### Customization
+
+`RTCPInboxList` is highly customizable to fit the styling needs of all types of apps. 
+It comes with a set of default styles defined in [styles.js](styles.js) which are applied to the various items within `RTCPNotification` and `RTCPNotificationBack` and can be overridden by providing an object to the `styles` prop.
+
+> ❗ Please note that provided styles get merged with existing default styles, so in order to unset a default style property you have to override it. See [styles.js](styles.js) for which properties are set by default.
+
+See simplified pseudo-code below for layout and stylings of a notification:
+
+```jsx
+// RTCPNotification
+<View> {/* styles.notification, styles.notificationUnread */}
+  <View>
+    <Text>{headerText}</Text>  {/* styles.header, styles.headerUnread */}
+    <Text>{item.title}</Text>  {/* styles.title, styles.titleUnread} */}
+    <Text>{item.message}</Text> {/* styles.message, styles.messageUnread */}
+    <Text>{item.link}</Text> {/* styles.link */}
+  </View>
+  <View>
+    <Image source={{ uri: item.image }} /> {/* styles.image */}
+    <Modal> {/* Modal for fullscreen image */}
+      <View>
+        <Image source={{ uri: item.image }} /> {/* styles.fsImage */}
+      </View>
+    </Modal>
+  </View>
+</View>
+```
+
+```jsx
+// RTCPNotificationBack
+<View> {/* styles.hiddenItem */}
+  <View> {/* styles.deleteView */}
+    <Text>Delete</Text> {/* styles.deleteText */}
+  </View>
+</View>
+```
+
+The following sample would make the image show as circular image:
+
+```jsx
+<RTCPInboxList styles={{ image: { borderRadius: 25 } }}>
+```
+
+To customize the text of the header you can provide a function to the `headerText` prop returning a string (or component). The notification's `item` is provided as function parameter:
+
+```jsx
+import moment from "moment";
+<RTCPInboxList headerText={(item) => moment(item.time).format("LLLL")}>
+```
+
+For the fullscreen image that is shown in a `Modal` when the user taps on the image, it is possible
+ to provide a custom component by providing a function through the `renderFsImage` prop. This allows to adjust the image presentation and a possible 'Back' button to the app's stylings. The function takes the `item` and a function to be called to close the modal as arguments. Example:
+
+```jsx
+<RTCPInboxList
+  renderFsImage={(item, close) => (
+    <View>
+      <Image style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
+      <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => close()}>
+        <Text style={{padding: 10, color: 'yellow'}}>❮ Back</Text>
+      </TouchableOpacity>
+    </View>
+  )}
+/>
+```
+
+To replace the default 'Delete' text in the SwipeList's hiddenItem, provide a component using the `renderDeleteItem` prop. The following will show a trash can icon instead:
+
+```jsx
+<RTCPInboxList
+  renderDeleteItem={<Text style={color: 'white'}>🗑️</Text>}
+/>
+```
+
+See the [examples folder](examples) for a full customization sample.
 
 ## Reference - Core Module
 
@@ -589,86 +693,36 @@ Removes a `handler` function from the `event` list.
   *Function parameters*  
   - `inbox` *`(Array)`* - inbox (array of notifications)
 
-## Example
+## Reference - Inbox Component
 
-The following code creates a sample Inbox Component:
+Note: props for `RTCPNotification` and `RTCPNotificationBack` can also be provided to `RTCPInboxList`, as all props are forwarded by `RTCPInboxList` to these two components.
 
-```jsx
-import React, { Component } from 'react';
-import { View, FlatList, Alert, Text } from 'react-native';
+### RTCPInboxList
 
-import moment from 'moment';
+In addition to everything from `SwipeListview` and `Flatlist`, the following props are available:
 
-import RTCPInbox from 'rtcp-react-native/RTCPInbox';
+- **`onSyncError`** *`(function), default: Alert.alert("Error getting notifications from server. Please try again later.")`*  
+  Function that is called when syncing the Inbox with the server on pull-to-refresh failed.
 
-export default class Notifications extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      notifications: [],
-      refreshing: false
-    };
-  }
+- **`disableDelete`** *`(Boolean), default: undefined (false)`*  
+  If set to true, swiping will be disabled by not providing a `renderHiddenItem` to `SwipeListView`
 
-  componentDidMount() {
-    this.setState({notifications: RTCPInbox.getInbox()});
-    RTCPInbox.registerEventHandler("onInboxUpdate", this.updateInbox);
-  }
+### RTCPNotification
 
-  componentWillUnmount() {
-    RTCPInbox.unregisterEventHandler("onInboxUpdate", this.updateInbox);
-  }
+- **`headerText`** *`(function(item)), default: new Date(this.props.item.time).toLocaleString()`*  
+  Function returning a string to be put as header of a notification. The current rendered `item` is provided as parameter.
 
-  updateInbox = (inbox) => {
-    this.setState({notifications: inbox});
-  }
-  
-  onRefresh = () => {
-    this.setState({refreshing:true}, async () => {
-      try {
-        await RTCPInbox.syncInbox(true);
-      } catch(error) {
-        Alert.alert("Error getting notifications from server. Please try again later.");
-      }
-      this.setState({refreshing:false});
-    });
-  }
+- **`onLinkOpen`** *`(function(url)), default: (url) => { Linking.openURL(url) }`*  
+  By default `Linking.openURL` is called when the user opens a link. If set the provided function will be called instead, allowing to e.g. open the link in an in-app-browser.
 
-  onViewableItemsChanged = ({viewableItems, changed}) => {
-    viewableItems.forEach(item => {
-      if (item.item?.read === false) RTCPInbox.setRead(item.index);
-    });
-  }
+- **`styles`** *`(Object)`*  
+  Allows to provide styles that are applied to the items within `RTCPNotification`. See [`styles.js`](styles.js) for the default styles.
 
-  renderItem = ({item}) => {
-    return (
-      <View style={{padding: 10}}>
-        <Text style={{fontWeight: item.read ? 'normal' : 'bold'}}>
-          {moment(item.time).format('L')}
-        </Text>
-        {item.title && <Text style={{fontWeight: 'bold'}}>{item.title}</Text>}
-        <Text>{item.message}</Text>
-      </View>
-    );
-  };
+- **`renderFsImage`** *`(function(item, closeFunc))`*  
+  Function returning a component to render the fullscreen image. The provided component is rendered within a `Modal` and shown when the user taps an image.
+  The current `item` as well as a `closeFunc` to close the Modal e.g. on tapping a back button are provided as parameters.
 
-  render() {
-    return (
-      <FlatList
-        data={this.state.notifications}
-        renderItem={this.renderItem}
-        keyExtractor={(item) => item.push_id}
-        ListEmptyComponent={<Text style={{textAlign: 'center'}}>You have no notifications</Text>}
-        refreshing={this.state.refreshing}
-        onRefresh={this.onRefresh}
-        viewabilityConfig = {{
-          minimumViewTime: 1000,
-          itemVisiblePercentThreshold: 90,
-          waitForInteraction: false
-        }}
-        onViewableItemsChanged = {this.onViewableItemsChanged}
-      />
-    );
-  }
-}
-```
+### RTCPNotificationBack
+
+- **`renderDeleteItem`** *`(Component), default: <Text style={[defaultStyles.deleteText, this.props.styles?.deleteText]}>Delete</Text>`*  
+  Component to render as delete item within `RTCPNotificationBack`.

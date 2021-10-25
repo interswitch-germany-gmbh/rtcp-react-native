@@ -89,3 +89,5 @@ export default class RTCPInboxList extends Component {
         );
     }
 }
+
+export { RTCPInboxList, RTCPInboxNotification, RTCPInboxNotificationBack };
