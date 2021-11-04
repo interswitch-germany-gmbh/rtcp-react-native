@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Alert, Text } from "react-native";
+import { Alert, Text, RefreshControl } from "react-native";
 
 import RTCPInbox from './RTCPInbox';
 import { RTCPInboxNotification, RTCPInboxNotificationBack } from './RTCPInboxNotification';
@@ -73,8 +73,11 @@ export default class RTCPInboxList extends Component {
                 rightOpenValue={-75}
                 recalculateHiddenLayout={true}
 
-                refreshing={this.state.refreshing}
-                onRefresh={this.onRefresh}
+                refreshControl={<RefreshControl
+                    {...this.props.refreshControlProps}
+                    refreshing={this.state.refreshing}
+                    onRefresh={this.onRefresh}
+                    />}
                 alwaysBounceVertical={true}
 
                 viewabilityConfig={{

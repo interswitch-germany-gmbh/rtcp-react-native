@@ -120,7 +120,8 @@ class RTCP extends RTCPEvents {
     }
 
     async getRecentNotifications(count = 10) {
-        return RTCPApi.getRecentNotifications(this.hardware_id, count);
+        let notifications = await RTCPApi.getRecentNotifications(this.hardware_id, count);
+        return notifications.map((item) => this._convertFromOld(item));
     }
 
     async deleteNotification(push_id) {
@@ -167,23 +168,7 @@ class RTCP extends RTCPEvents {
                     notification.data.app_data = JSON.parse(notification.data.app_data);
                 }
 
-                // remove title if it's the same as the message (old RTCP behaviour)
-                if (notification.data.title && notification.data.title === notification.data.message) {
-                    notification.data.title = null;
-                }
-
-                // compatibility to old RTCP payload when push_id was in app_data
-                if (notification.data.app_data.push_id) {
-                    if (!notification.data.push_id) notification.data.push_id = notification.data.app_data.push_id;
-                    delete notification.data.app_data.push_id;
-                }
-
-                // compatibility to old RTCP payload when url was in app_data
-                if (notification.data.app_data.url) {
-                    if (!notification.data.url) notification.data.url = notification.data.app_data.url;
-                    delete notification.data.app_data.url;
-                }
-                if (Object.keys(notification.data.app_data).length === 0) notification.data.app_data == null; // set to null if empty for consistency with server inbox style
+                notification.data = this._convertFromOld(notification.data);
             }
 
             this.log("Received remote push notification: ", notification);
@@ -246,6 +231,30 @@ class RTCP extends RTCPEvents {
         } else if (pushID.startsWith("P")) {
             return pushID.substring(1) + "1";
         }
+    }
+
+    _convertFromOld(notification) {
+        // remove title if it's the same as the message (old RTCP behaviour)
+        if (notification.title && notification.title === notification.message) {
+            notification.title = null;
+        }
+
+        if (notification.app_data) {
+            // compatibility to old RTCP payload when push_id was in app_data
+            if (notification.app_data.push_id) {
+                if (!notification.push_id) notification.push_id = notification.app_data.push_id;
+                delete notification.app_data.push_id;
+            }
+
+            // compatibility to old RTCP payload when url was in app_data
+            if (notification.app_data.url) {
+                if (!notification.url) notification.url = notification.app_data.url;
+                delete notification.app_data.url;
+            }
+            if (Object.keys(notification.app_data).length === 0) notification.app_data = null; // set to null if empty for consistency with server inbox style
+        }
+
+        return notification;
     }
 }
 

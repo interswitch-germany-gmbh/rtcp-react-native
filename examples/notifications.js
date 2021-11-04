@@ -70,6 +70,9 @@ export default class Notifications extends Component {
                     styles={styles}
                     disableDelete={false}
                     headerText={(item) => moment(item.time).format("LLLL")}
+
+                    refreshControlProps={{ colors: [colors.navy, colors.white], tintColor: colors.white }}
+
                     swipeRowStyle={{ alignContent: "center" }}
                     renderDeleteItem={<Text style={styles.deleteText}>🗑️</Text>}
 
@@ -90,7 +93,6 @@ export default class Notifications extends Component {
                             )}
                         </View>
                     )}
-
                 />
             </View>
         );

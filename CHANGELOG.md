@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 / 2021-11-04
+
+* Add refreshControlProps to RTCPInboxList
+* Convert old notification payload to new when fetching Notifications from server
+
 ## 1.2.1 / 2021-10-25
 
 * Add documentation and example for `RTCPInboxList` component

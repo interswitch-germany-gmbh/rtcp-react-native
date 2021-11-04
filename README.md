@@ -707,6 +707,9 @@ In addition to everything from `SwipeListview` and `Flatlist`, the following pro
 - **`disableDelete`** *`(Boolean), default: undefined (false)`*  
   If set to true, swiping will be disabled by not providing a `renderHiddenItem` to `SwipeListView`
 
+- **`refreshControlProps`** *`(Object), default: undefined`*  
+  Props to be forwarded to the `RefreshControl` component
+
 ### RTCPNotification
 
 - **`headerText`** *`(function(item)), default: new Date(this.props.item.time).toLocaleString()`*  
