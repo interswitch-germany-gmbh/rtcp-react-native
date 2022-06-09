@@ -394,6 +394,8 @@ It comes with a set of default styles defined in [styles.js](styles.js) which ar
 
 > ❗ Please note that provided styles get merged with existing default styles, so in order to unset a default style property you have to override it. See [styles.js](styles.js) for which properties are set by default.
 
+> ❗ Using `ItemSeparatorComponent` doesn't work well with the swipe-to-delete animations. Use `marginBottom` on each renderItem instead.
+
 See simplified pseudo-code below for layout and stylings of a notification:
 
 ```jsx

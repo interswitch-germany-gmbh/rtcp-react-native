@@ -1,14 +1,16 @@
 import { StyleSheet } from "react-native";
 
 export default defaultStyles = {
+    notificationWrapper: {
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        marginBottom: StyleSheet.hairlineWidth,
+        borderBottomColor: '#999'
+    },
     notification: {
         fontWeight: 'bold',
         backgroundColor: 'white',
         paddingVertical: 20,
         paddingHorizontal: 20,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        marginBottom: StyleSheet.hairlineWidth,
-        borderBottomColor: '#999',
         flexDirection: 'row',
         alignItems: 'center'
     },

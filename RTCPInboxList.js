@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Alert, Text, RefreshControl } from "react-native";
+import { Alert, Text, RefreshControl, Dimensions } from "react-native";
 
 import RTCPInbox from './RTCPInbox';
 import { RTCPInboxNotification, RTCPInboxNotificationBack } from './RTCPInboxNotification';
@@ -14,6 +14,14 @@ export default class RTCPInboxList extends Component {
             refreshing: false,
             showFsImage: ''
         };
+        this.rowRefs = {};
+
+        if (props.ItemSeparatorComponent && !props.disableDelete) {
+            console.warn(
+                `[RTCPInboxList] Using ItemSeparatorComponent doesn't work well with deletion animations.
+                Please consider using 'marginTop' on the notificationWrapper stylesheet class instead.
+                See the docs at https://github.com/interswitch-germany-gmbh/rtcp-react-native for details.`)
+        }
     }
 
     componentDidMount() {
@@ -42,35 +50,53 @@ export default class RTCPInboxList extends Component {
 
     onViewableItemsChanged = ({ viewableItems, changed }) => {
         viewableItems.forEach((item) => {
-            if (item["item"]["read"] === false) {
+            if (item.item && item["item"]["read"] === false) {
                 RTCPInbox.setRead(item["index"]);
             }
         });
     };
 
-    renderItem = ({item}) => (
-        <RTCPInboxNotification {...this.props} item={item} />
+    renderItem = ({item, index}) => (
+        <RTCPInboxNotification ref={(ref) => this.rowRefs[item.push_id] = ref} {...this.props} item={item} onCollapseEnd={() => this.deleteItem(index)} />
     )
 
     renderHiddenItem = (row, rowMap) => (
-        <RTCPInboxNotificationBack {...this.props} row={row} rowMap={rowMap} onDelete={(index) => RTCPInbox.delete(index)} />
+        <RTCPInboxNotificationBack {...this.props} row={row} rowMap={rowMap} onDelete={(key) => this.rowRefs[key].collapse()} />
     )
 
     ListEmptyComponent = () => (
         <Text style={{ paddingVertical: 40, paddingHorizontal: 20, textAlign: "center" }}>You have no notifications</Text>
     )
 
+    deleteItem = (index) => {
+        this.collapsing = false
+        RTCPInbox.delete(index)
+    }
+
+    onSwipeValueChange = ({key, value}) => {
+        if (value < -Dimensions.get('window').width && !this.collapsing) {
+            this.collapsing = true
+            this.rowRefs[key].collapse()
+        }
+    }
+
     render() {
         return (
             <SwipeListView
                 data={this.state.notifications}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item) => item?.push_id}
 
                 renderItem={this.renderItem}
                 ListEmptyComponent={this.ListEmptyComponent}
                 renderHiddenItem={this.props.disableDelete ? undefined : this.renderHiddenItem}
-                renderDeleteItem={this.props.renderDeleteItem}
+
+                disableRightSwipe
                 rightOpenValue={-75}
+
+                rightActivationValue={-150}
+                rightActionValue={-Dimensions.get('window').width}
+                onSwipeValueChange={this.onSwipeValueChange}
+
                 recalculateHiddenLayout={true}
 
                 refreshControl={<RefreshControl

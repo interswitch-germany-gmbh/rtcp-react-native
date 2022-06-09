@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 / 2022-06-09
+
+* Animate deletions
+* Support swipe-out to delete
+
 ## 1.2.2 / 2021-11-04
 
 * Add refreshControlProps to RTCPInboxList
