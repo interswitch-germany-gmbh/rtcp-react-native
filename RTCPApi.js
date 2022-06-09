@@ -101,7 +101,38 @@ class RTCPApi {
             this.log("Error deleting notification from server:", error);
             return false;
         }
+    }
 
+    async getAdImageData(zone_id) {
+        if (!zone_id) return {};
+        try {
+            this.log('Getting Ad image data from server for zone ' + zone_id);
+            const response = await fetch(this.baseUrl + "ads/ajson.php?zoneid=" + zone_id);
+            let res = await response.json();
+            if (!response.ok) {
+                throw "Received non-ok response from RTCP";
+            }
+            return res || {};
+        } catch (error) {
+            this.log("Error getting ad image data:", error);
+            return {};
+        }
+    }
+
+    async getAllAdImageData(zone_id) {
+        if (!zone_id) return {};
+        try {
+            this.log('Getting Ad images data from server for zone ' + zone_id);
+            const response = await fetch(this.baseUrl + "ads/ajson_all.php?zoneid=" + zone_id);
+            let res = await response.json();
+            if (!response.ok) {
+                throw "Received non-ok response from RTCP";
+            }
+            return res || [];
+        } catch (error) {
+            this.log("Error getting all ad images data:", error);
+            return [];
+        }
     }
 }
 

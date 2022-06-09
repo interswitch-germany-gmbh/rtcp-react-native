@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 export default defaultStyles = {
     notificationWrapper: {
@@ -66,5 +66,31 @@ export default defaultStyles = {
     },
     deleteText: {
         color: 'white'
+    }
+}
+
+export const adDefaultStyles = {
+    adImage: {
+        width: Dimensions.get('window').width
+    },
+    adCarouselContainer: {
+    },
+    indicatorContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    indicatorDot: {
+        height: 10,
+        width: 10,
+        borderRadius: 5,
+        marginHorizontal: 4,
+    },
+    indicatorDotActive: {
+        backgroundColor: 'blue'
+    },
+    indicatorDotInactive: {
+        backgroundColor: 'grey'
     }
 }
