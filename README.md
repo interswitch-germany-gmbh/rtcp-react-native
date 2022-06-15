@@ -48,10 +48,16 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  yarn add github:interswitch-germany-gmbh/rtcp-react-native
 
   # using npm
-  npm install https://github.com/interswitch-germany-gmbh/rtcp-react-native.git
+  npm install github:interswitch-germany-gmbh/rtcp-react-native
+  ```
+
+  To install and bind to a specific version add the version tag as hash:
+
+  ```sh
+  yarn add github:interswitch-germany-gmbh/rtcp-react-native#2.0.0
   ```
 
 - Add all required peerDependencies, as they're not installed automatically ([why?](https://github.com/react-native-community/cli/issues/914#issuecomment-574759432)):
