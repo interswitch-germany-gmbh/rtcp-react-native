@@ -8,17 +8,19 @@ import { adDefaultStyles } from "./styles"
 export class RTCPAdImage extends Component {
     constructor(props) {
         super(props);
-        this.state = { adData: {} };
+        this.state = { adJson: {} };
     }
 
     async componentDidMount() {
-        this.setState({ adData: await RTCPApi.getAdImageData(this.props.zoneId) });
+        let adJson = await RTCPApi.getAdForZone(this.props.zoneId);
+        this.setState({ adJson: adJson });
+        this.props.onLoad?.(adJson);
     }
 
     render() {
         return (
             <RTCPAdImageBase
-                adData = {this.state.adData}
+                adJson = {this.state.adJson}
                 {...this.props}
             />
         );
@@ -29,13 +31,15 @@ export class RTCPAdsCarousel extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            adsData: [],
+            adsJson: [],
             currentSlide: 0
         };
     }
 
     async componentDidMount() {
-        this.setState({ adsData: await RTCPApi.getAllAdImageData(this.props.zoneId) });
+        let adsJson = await RTCPApi.getAllAdsForZone(this.props.zoneId);
+        this.setState({ adsJson: adsJson });
+        this.props.onLoad?.(adsJson);
     }
 
     onScroll = (event) => {
@@ -52,12 +56,16 @@ export class RTCPAdsCarousel extends Component {
     }
 
     renderItem = ({item}) => (
-        <RTCPAdImageBase adData={item} />
+        <RTCPAdImageBase
+            adJson={item}
+            styles={this.props.styles}
+            {...this.props.itemProps}
+        />
     )
 
-    renderPagination = () => (
+    renderIndicatorDots = () => (
         <View style={[adDefaultStyles.indicatorContainer, this.props.styles?.indicatorContainer]}>
-            {this.state.adsData.map((_, i) => (
+            {this.state.adsJson.map((_, i) => (
                 <View
                     key={i.toString()}
                     style={[adDefaultStyles.indicatorDot,
@@ -72,7 +80,7 @@ export class RTCPAdsCarousel extends Component {
         return (
             <View>
                 <FlatList
-                    data={this.state.adsData}
+                    data={this.state.adsJson}
                     renderItem={this.renderItem}
                     keyExtractor={(item) => item.bannerid}
                     horizontal={true}
@@ -82,10 +90,10 @@ export class RTCPAdsCarousel extends Component {
                     snapToAlignment="start"
                     snapToInterval={Dimensions.get('window').width}
                     onScroll={this.onScroll}
-                    style={[adDefaultStyles.adCarouselContainer, this.props.styles?.adCarouselContainer]}
+                    style={[adDefaultStyles.adsCarousel, this.props.styles?.adsCarousel]}
                     {...this.props}
                 />
-                {!this.props.hidePagination && this.renderPagination()}
+                {!this.props.hideIndicatorDots && this.renderIndicatorDots()}
             </View>
         );
     }
@@ -103,11 +111,12 @@ export class RTCPAdImageBase extends Component {
         const { source, ...props } = this.props
         return (
             <TouchableOpacity
-                onPress={() => Linking.openURL(props.adData.url).catch()}
+                onPress={() => Linking.openURL(props.adJson?.url).catch()}
+                style={[adDefaultStyles.adImageWrapper, this.props.styles?.adImageWrapper]}
                 {...props.touchableProps}>
                 <FastImage
-                    source={{ uri: props.adData?.imageurl, ...source }}
-                    style={[{ aspectRatio: (Number(props.adData?.width) / Number(props.adData?.height)) || 0 }, adDefaultStyles.adImage, props.style]}
+                    source={{ uri: props.adJson?.imageurl, ...source }}
+                    style={[{ aspectRatio: (Number(props.adJson?.width) / Number(props.adJson?.height)) || 0 }, adDefaultStyles.adImage, this.props.styles?.adImage, props.style]}
                     {...props.imageProps}
                 />
             </TouchableOpacity>

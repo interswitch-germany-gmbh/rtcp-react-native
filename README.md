@@ -12,6 +12,7 @@
   - [Inbox Module](#inbox-module)
   - [Inbox List Component](#inbox-list-component)
     - [Customization](#customization)
+  - [Ads Components](#ads-components)
 - [Reference - Core Module](#reference---core-module)
   - [Configuration](#configuration)
   - [Methods](#methods)
@@ -20,10 +21,13 @@
   - [Configuration](#configuration-1)
   - [Methods](#methods-1)
   - [Events](#events-1)
-- [Reference - Inbox Component](#reference---inbox-component)
+- [Reference - Inbox Components](#reference---inbox-components)
   - [RTCPInboxList](#rtcpinboxlist)
   - [RTCPNotification](#rtcpnotification)
   - [RTCPNotificationBack](#rtcpnotificationback)
+- [Reference - Ads Components](#reference---ads-components)
+  - [RTCPAdImage](#rtcpadimage)
+  - [RTCPAdsCarousel](#rtcpadscarousel)
 
 ## About
 
@@ -342,6 +346,28 @@ When a notification containing a Deep Link is tapped, the `'url'` event is emitt
 
 If Deep Linking is set up in `react-navigation`, it listens to this event by default. Therefore, it will behave just like when a Deep Link is opened from a browser with no extra code being required.
 
+To target Deep Links from the backend you need to upload a definition in JSON format that defines the paths and params. Its syntax is similar to the [`linking prop` in `react-navigation`](https://reactnavigation.org/docs/configuring-links). See below for a sample:
+
+```json
+[
+   {
+      "path":"myapp://quicktransfer",
+      "description":"Quicktransfer",
+      "params":{
+         "pin":"PIN"
+      }
+   },
+   {
+      "path":"myapp://quickqr/:foo/:bar?",
+      "description":"Quick QR",
+      "params":{
+         ":foo":"Foo Parameter",
+         ":bar?":"Bar Parameter"
+      }
+   }
+]
+```
+
 ### Inbox Module
 
 When using the Inbox Module, nothing else is usually required from the Core Module.
@@ -465,6 +491,26 @@ To replace the default 'Delete' text in the SwipeList's hiddenItem, provide a co
 ```
 
 See the [examples folder](examples) for a full customization sample.
+
+### Ads Components
+
+The SDK provides two components to help integrate advertisements into an app:
+
+- `RTCPAdImage`  
+  This component can be used to show an ad as an image. The image (a.k.a. banner) shown will be selected and loaded from the backend, based on the ad zone id provided and its server-side settings (e.g. weight).
+- `RTCPAdsCarousel`  
+  This component loads all images from an ad zone and shows them as carousel. See the reference below for its settings.
+
+See below for a basic sample:
+
+```jsx
+import { RTCPAdImage, RTCPAdsCarousel } from 'rtcp-react-native/RTCPAds';
+
+...
+
+<RTCPAdImage zoneId=123 />
+<RTCPAdsCarousel zoneId=234 />
+```
 
 ## Reference - Core Module
 
@@ -695,7 +741,7 @@ Removes a `handler` function from the `event` list.
   *Function parameters*  
   - `inbox` *`(Array)`* - inbox (array of notifications)
 
-## Reference - Inbox Component
+## Reference - Inbox Components
 
 Note: props for `RTCPNotification` and `RTCPNotificationBack` can also be provided to `RTCPInboxList`, as all props are forwarded by `RTCPInboxList` to these two components.
 
@@ -721,7 +767,7 @@ In addition to everything from `SwipeListview` and `Flatlist`, the following pro
   By default `Linking.openURL` is called when the user opens a link. If set the provided function will be called instead, allowing to e.g. open the link in an in-app-browser.
 
 - **`styles`** *`(Object)`*  
-  Allows to provide styles that are applied to the items within `RTCPNotification`. See [`styles.js`](styles.js) for the default styles.
+  Allows to provide styles that are applied to the items within `RTCPNotification`. See [`styles.js`](styles.js) for available and default styles.
 
 - **`renderFsImage`** *`(function(item, closeFunc))`*  
   Function returning a component to render the fullscreen image. The provided component is rendered within a `Modal` and shown when the user taps an image.
@@ -731,3 +777,40 @@ In addition to everything from `SwipeListview` and `Flatlist`, the following pro
 
 - **`renderDeleteItem`** *`(Component), default: <Text style={[defaultStyles.deleteText, this.props.styles?.deleteText]}>Delete</Text>`*  
   Component to render as delete item within `RTCPNotificationBack`.
+
+## Reference - Ads Components
+
+### RTCPAdImage
+
+This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) to cache images and reduce server load.
+
+- **`zoneId`** *`(Number) - mandatory`*  
+  ID of the adserver zone to load images for
+
+- **`styles`** *`(Object)`*  
+  Allows to provide styles that are applied to the items within `RTCPAdImage`. See `adDefaultStyles` in [`styles.js`](styles.js) for available and default styles.
+
+- **`touchableProps`** *`(Object), default: undefined`*  
+  Props to forward to the `TouchableOpacity` component wrapped around the image.
+
+- **`imageProps`** *`(Object), default: undefined`*  
+  Props to forward to the `FastImage` component.
+
+### RTCPAdsCarousel
+
+This component is based on a `FlatList` with `RTCPAdImage`s as horizontal items.
+
+- **`zoneId`** *`(Number) - mandatory`*  
+  ID of the adserver zone to load images for
+
+- **`styles`** *`(Object)`*  
+  Allows to provide styles that are applied to the items within `RTCPAdsCarousel`. See `adDefaultStyles` in [`styles.js`](styles.js) for available and default styles.
+
+- **`onLoad`** *`(function(adsJson)), default: undefined`*  
+  Function that is called after the ad information has been retrieved from the server, with `adsJson` containing the JSON response.
+
+- **`hideIndicatorDots`** *`(Boolean), default: undefined (false)`*  
+  Defines whether or not to render indicator dots below the images.
+
+- **`itemProps`** *`(Object), default: undefined`*  
+  Props to forward to each image component.

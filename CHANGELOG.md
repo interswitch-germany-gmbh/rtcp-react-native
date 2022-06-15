@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 / 2022-06-15
+
+* Add api and components for ads
+
 ## 1.3.0 / 2022-06-09
 
 * Animate deletions

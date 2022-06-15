@@ -70,10 +70,14 @@ export default defaultStyles = {
 }
 
 export const adDefaultStyles = {
+    /* RTCPAdImage */
+    adImageWrapper: {
+    },
     adImage: {
         width: Dimensions.get('window').width
     },
-    adCarouselContainer: {
+    /* RTCPAdsCarousel */
+    adsCarousel: {
     },
     indicatorContainer: {
         flexDirection: 'row',

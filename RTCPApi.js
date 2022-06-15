@@ -103,7 +103,16 @@ class RTCPApi {
         }
     }
 
-    async getAdImageData(zone_id) {
+    _statustextToJSONPayload(adData) {
+        try {
+            adData.payload = JSON.parse(adData.statustext);
+        } catch (e) {
+            adData.payload = {};
+        }
+        return adData;
+    }
+
+    async getAdForZone(zone_id) {
         if (!zone_id) return {};
         try {
             this.log('Getting Ad image data from server for zone ' + zone_id);
@@ -112,15 +121,15 @@ class RTCPApi {
             if (!response.ok) {
                 throw "Received non-ok response from RTCP";
             }
-            return res || {};
+            return this._statustextToJSONPayload(res || {});
         } catch (error) {
             this.log("Error getting ad image data:", error);
             return {};
         }
     }
 
-    async getAllAdImageData(zone_id) {
-        if (!zone_id) return {};
+    async getAllAdsForZone(zone_id) {
+        if (!zone_id) return [];
         try {
             this.log('Getting Ad images data from server for zone ' + zone_id);
             const response = await fetch(this.baseUrl + "ads/ajson_all.php?zoneid=" + zone_id);
@@ -128,7 +137,7 @@ class RTCPApi {
             if (!response.ok) {
                 throw "Received non-ok response from RTCP";
             }
-            return res || [];
+            return Array.isArray(res) ? res.map((ad) => this._statustextToJSONPayload(ad)) : []
         } catch (error) {
             this.log("Error getting all ad images data:", error);
             return [];
