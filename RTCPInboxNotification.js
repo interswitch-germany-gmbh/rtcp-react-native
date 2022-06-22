@@ -11,10 +11,16 @@ export class RTCPInboxNotification extends PureComponent {
             animHeight: 'auto',
             height: 'auto'
         };
+
+        this.onCollapseEnd = this.props.onCollapseEnd
     }
 
     setFsImageVisible = (visible) => {
         this.setState({ fsImageVisible: visible });
+    }
+
+    registerCollapseEnd = (func) => {
+        this.onCollapseEnd = func
     }
 
     onAnimLayout = (event) => {
@@ -38,7 +44,7 @@ export class RTCPInboxNotification extends PureComponent {
                 useNativeDriver: false
             }).start((data) => {
                 this.isCollapsing = false;
-                this.props.onCollapseEnd();
+                this.onCollapseEnd?.();
             });
         }
     }

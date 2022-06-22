@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 / 2022-06-22
+
+* Fix ref issue in custom renderItem
+
 ## 2.0.0 / 2022-06-15
 
 * Add api and components for ads

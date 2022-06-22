@@ -76,9 +76,9 @@ export default class Notifications extends Component {
                     swipeRowStyle={{ alignContent: "center" }}
                     renderDeleteItem={<Text style={styles.deleteText}>🗑️</Text>}
 
-                    renderItem={({ item }) => (
+                    renderItem={(item, ref) => (
                         <View>
-                            <RTCPInboxNotification styles={styles} item={item} onLinkOpen={this.props.onLinkOpen}
+                            <RTCPInboxNotification ref={ref} styles={styles} item={item} onLinkOpen={this.props.onLinkOpen}
                                 renderFsImage={(item, close) => (
                                     <View>
                                         <Image style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />

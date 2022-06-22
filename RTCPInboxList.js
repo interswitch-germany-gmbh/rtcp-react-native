@@ -56,12 +56,21 @@ export default class RTCPInboxList extends Component {
         });
     };
 
-    renderItem = ({item, index}) => (
-        <RTCPInboxNotification ref={(ref) => this.rowRefs[item.push_id] = ref} {...this.props} item={item} onCollapseEnd={() => this.deleteItem(index)} />
-    )
+    registerItemRef = (ref, item, index) => {
+        if (ref && item.push_id) {
+            this.rowRefs[item.push_id] = ref
+            ref.registerCollapseEnd?.(() => this.deleteItem(index))
+        }
+    }
+
+    renderItem = ({item, index}) => {
+        return this.props.renderItem
+            ? this.props.renderItem(item, (ref) => this.registerItemRef(ref, item, index))
+            : ( <RTCPInboxNotification ref={(ref) => this.rowRefs[item.push_id] = ref} {...this.props} item={item} onCollapseEnd={() => this.deleteItem(index)} /> )
+    }
 
     renderHiddenItem = (row, rowMap) => (
-        <RTCPInboxNotificationBack {...this.props} row={row} rowMap={rowMap} onDelete={(key) => this.rowRefs[key].collapse()} />
+        <RTCPInboxNotificationBack {...this.props} row={row} rowMap={rowMap} onDelete={(key) => this.rowRefs[key]?.collapse()} />
     )
 
     ListEmptyComponent = () => (
@@ -76,7 +85,7 @@ export default class RTCPInboxList extends Component {
     onSwipeValueChange = ({key, value}) => {
         if (value < -Dimensions.get('window').width && !this.collapsing) {
             this.collapsing = true
-            this.rowRefs[key].collapse()
+            this.rowRefs[key]?.collapse()
         }
     }
 
@@ -86,7 +95,6 @@ export default class RTCPInboxList extends Component {
                 data={this.state.notifications}
                 keyExtractor={(item) => item?.push_id}
 
-                renderItem={this.renderItem}
                 ListEmptyComponent={this.ListEmptyComponent}
                 renderHiddenItem={this.props.disableDelete ? undefined : this.renderHiddenItem}
 
@@ -114,6 +122,8 @@ export default class RTCPInboxList extends Component {
                 onViewableItemsChanged={this.onViewableItemsChanged}
 
                 {...this.props}
+
+                renderItem={this.renderItem}
             />
         );
     }

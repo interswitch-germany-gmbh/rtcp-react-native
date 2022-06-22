@@ -417,7 +417,7 @@ export default class Notifications extends Component {
 ```
 
 `RTCPInboxList` is based on [`SwipeListView`](https://github.com/jemise111/react-native-swipe-list-view#readme) and [`FlatList`](https://reactnative.dev/docs/flatlist). `RTCPInboxList` sets a few of their props which can be overridden by providing them as props to `RTCPInboxList`.
-For the list's `renderItem` a custom component called `RTCPInboxNotification` is provided. The default `renderHiddenItem` is `RTCPInboxNotificationBack`. All provided props are forwarded to these two components, i.e. all props of `RTCPNotification` and `RTCPNotificationBack` can also be provided through `RTCPInboxList`.
+For the list's `renderItem` a custom component called `RTCPInboxNotification` is provided. When defining a custom `renderItem`, for animations to work it is required to forward the `ref` prop to the `RTCPInboxNotification`, which is provided as second argument alongside the `item` (see [example](examples)). The default `renderHiddenItem` is `RTCPInboxNotificationBack`. All provided props are forwarded to these two components, i.e. all props of `RTCPNotification` and `RTCPNotificationBack` can also be provided through `RTCPInboxList`.
 
 #### Customization
 
