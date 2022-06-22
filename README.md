@@ -440,10 +440,10 @@ See simplified pseudo-code below for layout and stylings of a notification:
     <Text>{item.link}</Text> {/* styles.link */}
   </View>
   <View>
-    <Image source={{ uri: item.image }} /> {/* styles.image */}
+    <FastImage source={{ uri: item.image }} /> {/* styles.image */}
     <Modal> {/* Modal for fullscreen image */}
       <View>
-        <Image source={{ uri: item.image }} /> {/* styles.fsImage */}
+        <FastImage source={{ uri: item.image }} /> {/* styles.fsImage */}
       </View>
     </Modal>
   </View>
@@ -479,7 +479,7 @@ For the fullscreen image that is shown in a `Modal` when the user taps on the im
 <RTCPInboxList
   renderFsImage={(item, close) => (
     <View>
-      <Image style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
+      <FastImage style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
       <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => close()}>
         <Text style={{padding: 10, color: 'yellow'}}>❮ Back</Text>
       </TouchableOpacity>

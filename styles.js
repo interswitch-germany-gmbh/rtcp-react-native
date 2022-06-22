@@ -38,13 +38,11 @@ export default defaultStyles = {
         width: 50,
         height: 50,
         marginLeft: 10,
-        borderRadius: 3,
-        resizeMode: 'cover'
+        borderRadius: 3
     },
     fsImage: {
         width: '100%',
-        height: '100%',
-        resizeMode: 'contain'
+        height: '100%'
     },
     link: {
         color: 'darkblue',

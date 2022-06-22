@@ -1,6 +1,6 @@
 {
   "name": "rtcp-react-native",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "React Native module for integration with RTCP",
   "main": "RTCP.js",
   "scripts": {

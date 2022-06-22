@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { View, StatusBar, Text, TouchableOpacity, Image } from "react-native";
+import { View, StatusBar, Text, TouchableOpacity } from "react-native";
 
 import { RTCPInboxList, RTCPInboxNotification } from "rtcp-react-native/RTCPInboxList";
+import FastImage from 'react-native-fast-image';
 
 import moment from "moment";
 
@@ -81,7 +82,7 @@ export default class Notifications extends Component {
                             <RTCPInboxNotification ref={ref} styles={styles} item={item} onLinkOpen={this.props.onLinkOpen}
                                 renderFsImage={(item, close) => (
                                     <View>
-                                        <Image style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
+                                        <FastImage style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
                                         <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => close()}>
                                             <Text style={{padding: 10, color: 'yellow'}}>❮ Back</Text>
                                         </TouchableOpacity>

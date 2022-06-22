@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 / 2022-06-22
+
+* Use `FastImage` in `RTCPInbox`
+
 ## 2.0.1 / 2022-06-22
 
 * Fix ref issue in custom renderItem

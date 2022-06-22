@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
-import { View, Text, Image, Modal, Linking, TouchableOpacity, TouchableHighlight, Animated } from "react-native";
+import { View, Text, Modal, Linking, TouchableOpacity, TouchableHighlight, Animated } from "react-native";
+import FastImage from 'react-native-fast-image';
 
 import defaultStyles from "./styles"
 
@@ -72,12 +73,12 @@ export class RTCPInboxNotification extends PureComponent {
                         </View>
                         {item.image &&
                             <View>
-                                <Image source={{ uri: item.image }} style={[defaultStyles.image, this.props.styles?.image]} />
+                                <FastImage source={{ uri: item.image }} style={[defaultStyles.image, this.props.styles?.image]} />
                                 <Modal animationType="fade" visible={this.state.fsImageVisible} onRequestClose={() => { this.setFsImageVisible(!this.state.fsImageVisible) }}>
                                     <TouchableHighlight disabled={!item.url} onPress={() => item.url && openLinkFunc(item.url)}>
                                     {this.props.renderFsImage ? this.props.renderFsImage(item, () => this.setFsImageVisible(false)) :
                                         <View>
-                                            <Image source={{uri: item.image}} style={[defaultStyles.fsImage, this.props.styles?.fsImage]} />
+                                            <FastImage source={{uri: item.image}} style={[defaultStyles.fsImage, this.props.styles?.fsImage]} resizeMode={FastImage.resizeMode.contain} />
                                             <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => { this.setFsImageVisible(false) }}>
                                                 <Text style={{color: 'black', padding: 10}}>❮ Back</Text>
                                             </TouchableOpacity>
