@@ -34,9 +34,9 @@ class RTCPApi {
         }
     }
 
-    // update remote status of notification (read_receipt/{received,read})
+    // update remote status of notification (read_receipt/{received,tapped,read})
     async updateNotificationRemoteStatus(hardware_id, push_ids, status) {
-        if (!(status === "received" || status === "read")) return;
+        if (!(["received", "read", "tapped"].includes(status))) return;
 
         try {
             this.log('Updating remote status for notification with ID "' + push_ids + '" to', status);

@@ -188,6 +188,8 @@ class RTCP extends RTCPEvents {
             // user tapped notification
             this.log("User tapped notification: ", notification);
 
+            if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "tapped");
+
             this._emitEvent("onNotificationTapped", notification);
 
             if (this.deepLinking && notification.data.deeplink) {

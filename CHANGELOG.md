@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3 / 2022-11-21
+
+* Add support for "tapped" state
+
 ## 2.0.2 / 2022-06-22
 
 * Use `FastImage` in `RTCPInbox`
