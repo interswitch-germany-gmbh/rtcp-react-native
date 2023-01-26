@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 / 2023-01-26
+
+* Add possibility to use multiple appIDs in one app
+
 ## 2.0.3 / 2022-11-21
 
 * Add support for "tapped" state

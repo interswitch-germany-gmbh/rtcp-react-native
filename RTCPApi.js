@@ -14,12 +14,12 @@ class RTCPApi {
     appID = "";
 
     // register device with RTCP (devices/register_device)
-    async registerDevice(device) {
+    async registerDevice(device, app_id = this.appID) {
         try {
-            this.log("Registering with RTCP Server, hardware_id:", device.hardware_id);
+            this.log("Registering with RTCP Server, app_id:", app_id, "hardware_id:", device.hardware_id);
             const response = await fetch(this.baseUrl + "devices/register_device", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "AUTH-APP-ID": this.appID },
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": app_id },
                 body: JSON.stringify({ device: device })
             });
             if (!response.ok || !(await response.json()).processed) {
@@ -34,15 +34,36 @@ class RTCPApi {
         }
     }
 
+    // unregister device from RTCP (devices/unregister_device)
+    async unregisterDevice(device, app_id = this.appID) {
+        try {
+            this.log("Unregistering device from RTCP Server, app_id:", app_id, "hardware_id:", device.hardware_id);
+            const response = await fetch(this.baseUrl + "devices/unregister_device", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": app_id },
+                body: JSON.stringify({ device: device })
+            });
+            if (!response.ok || !(await response.json()).processed) {
+                throw "Received non-ok response from RTCP";
+            }
+
+            this.log("Successfully unregistered device from RTCP Server");
+            return true;
+        } catch (error) {
+            this.log("Error unregistering device from RTCP:", error);
+            return false;
+        }
+    }
+
     // update remote status of notification (read_receipt/{received,tapped,read})
-    async updateNotificationRemoteStatus(hardware_id, push_ids, status) {
+    async updateNotificationRemoteStatus(hardware_id, push_ids, status, app_id = this.appID) {
         if (!(["received", "read", "tapped"].includes(status))) return;
 
         try {
             this.log('Updating remote status for notification with ID "' + push_ids + '" to', status);
             const response = await fetch(this.baseUrl + "read_receipt/" + status, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "AUTH-APP-ID": this.appID },
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": app_id },
                 body: JSON.stringify({
                     hardware_id: hardware_id,
                     push_id: push_ids,

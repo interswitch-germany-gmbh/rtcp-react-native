@@ -21,7 +21,7 @@ class RTCP extends RTCPEvents {
     logPrefix = "[RTCP]";
     debugLog = true;
 
-    _events = ["onRemoteNotification", "onNotificationTapped", "onRegister"];
+    _events = ["onRemoteNotification", "onNotificationTapped", "onRegister", "onChangeAppID"];
 
     hardware_id = "";
 
@@ -29,6 +29,8 @@ class RTCP extends RTCPEvents {
         super();
         Object.assign(this, PushNotification);
     }
+
+    appID() { return RTCPApi.appID; }
 
     // custom logging - prepend module name in log output
     log() {
@@ -54,7 +56,10 @@ class RTCP extends RTCPEvents {
         let production = typeof options.production !== "undefined" ? options.production : false;
         RTCPApi.baseUrl = production ? RTCPApi.RTCP_BASE_URL_PROD : RTCPApi.RTCP_BASE_URL_TEST;
 
-        // clearOnStart: boolean, default: true
+        // autoRegister: boolean, default: true
+        this.autoRegister = typeof options.autoRegister !== "undefined" ? options.autoRegister : true;
+
+        // clearAfter: boolean, default: true
         this.clearAfter = typeof options.clearAfter !== "undefined" ? options.clearAfter : 2000;
 
         // clearOnStart: boolean, default: true
@@ -128,15 +133,16 @@ class RTCP extends RTCPEvents {
         RTCPApi.deleteNotification(this.hardware_id, push_id);
     }
 
-    // --- private methods ---
-
-    async _onRTCPRegister(token) {
-        this.log("Registered with FCM/APNs. hardware_id:", this.hardware_id, "token:", token.token);
+    async registerDevice(app_id = undefined) {
+        if (!this.token) {
+            this.log("Unable to register as token is unset.");
+            return;
+        }
 
         // create device registration data
         let device = {
             hardware_id: this.hardware_id,
-            push_token: token.token,
+            push_token: this.token,
             platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
             device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
             api_version: "2",
@@ -145,18 +151,38 @@ class RTCP extends RTCPEvents {
         };
         let deviceJson = JSON.stringify(device);
 
+        let oldAppID = RTCPApi.appID;
+        if (app_id) RTCPApi.appID = app_id;  // change appID globally if provided
+        let pref_key = "rtcp_device" + (app_id ? "_" + app_id : "");  // store individually for app_id if provided
+
         // check if registration data has changed. if not, do not register again to reduce server load
-        const registeredDevice = await DefaultPreference.get("rtcp_device");
+        const registeredDevice = await DefaultPreference.get(pref_key);
         if (registeredDevice === null || registeredDevice !== deviceJson) {
             // send registration to RTCP
             if (await RTCPApi.registerDevice(device)) {
                 // store device data for later comparison
-                await DefaultPreference.set("rtcp_device", deviceJson);
+                await DefaultPreference.set(pref_key, deviceJson);
                 this._emitEvent("onRegister");
             }
         } else {
-            this.log("Device data and token are unchanged, not sending registration to RTCP Server");
+            this.log("Device data and token are unchanged, not sending registration to RTCP Server" + (app_id ? " for appID " + app_id : ""));
         }
+
+        if (app_id && RTCPApi.appID !== oldAppID) this._emitEvent("onChangeAppID", RTCPApi.appID, oldAppID);
+    }
+
+    async unregisterDevice(app_id = undefined) {
+        if (await RTCPApi.unregisterDevice({ device: { hardware_id: this.hardware_id } }, app_id)) {
+            DefaultPreference.clear("rtcp_device" + (app_id ? "_" + app_id : ""));
+        }
+    }
+
+    // --- private methods ---
+
+    async _onRTCPRegister(token) {
+        this.log("Registered with FCM/APNs. hardware_id:", this.hardware_id, "token:", token.token);
+        this.token = token.token;
+        if (this.autoRegister) await this.registerDevice();
     }
 
     async _onRTCPNotification(notification) {
@@ -178,9 +204,9 @@ class RTCP extends RTCPEvents {
                 this._handleAndroidNotification(notification.data);
             }
 
-            if (Platform.OS !== "ios" || !notification.data.message) {
+            if (!(Platform.OS === "ios" && notification.message)) {
                 // update notification's remote status to "received" (on iOS done in NSE, except for silent pushes)
-                if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "received");
+                if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "received", notification.data.app_id);
             }
 
             this._emitEvent("onRemoteNotification", notification);
@@ -188,7 +214,7 @@ class RTCP extends RTCPEvents {
             // user tapped notification
             this.log("User tapped notification: ", notification);
 
-            if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "tapped");
+            if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "tapped", notification.data.app_id);
 
             this._emitEvent("onNotificationTapped", notification);
 

@@ -17,6 +17,7 @@
   - [Configuration](#configuration)
   - [Methods](#methods)
   - [Events](#events)
+  - [Advanced Methods](#advanced-methods)
 - [Reference - Inbox Module](#reference---inbox-module)
   - [Configuration](#configuration-1)
   - [Methods](#methods-1)
@@ -546,6 +547,9 @@ Open URLs attached to the notification when the user opened the app by tapping t
 * **`deepLinking`** *`(Boolean) - optional, default: true`*  
 Handle Deep Links when a user taps a notification with a Deep Link attached (i.e. emit `'url'` event).
 
+* **`autoRegister`** *`(Boolean) - optional, default: true`*  
+Automatically register with backend when push token has been received.
+
 
 ### Methods
 
@@ -631,13 +635,54 @@ Removes a `handler` function from the `event` list.
 
 - **`"onRemoteNotification": (notification)`**  
   Emitted when a push notification is received from the RTCP server.  
+
   *Function parameters*  
   - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
 
 - **`"onNotificationTapped": (notification)`**  
   Emitted when the app is opened by the user having tapped a notification in the OS's notification center.  
+
   *Function parameters*  
   - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+
+- **`"onChangeAppID": (newAppID, oldAppID)`**  
+  Emitted when the the appID has changed through `registerDevice`  
+
+  *Function parameters*  
+  - `newAppID` *(String)* - the new appID the SDK has been set to
+  - `oldAppID` *(String)* - the appID the SDK had used before
+
+### Advanced Methods
+
+```js
+function registerDevice(app_id = undefined)
+```
+
+Registers the device with the RTCP backend. If the device has already been registered and there are no changes
+in registration data, no request will be sent to the backend.
+
+This method is not required for normal operation since it is run automatically, unless `autoRegister` is set to false.
+It is designed and only required for use with multiple different backend applications (appIDs).
+
+To switch to another RTCP appID within a ReactNative application, call this method providing the new appID.
+The SDK will then switch to that appID globally. If the appID provided is different from the global appID before,
+the event `onChangeAppID` will be emitted.
+
+*Parameters*
+
+- `app_id` *`(String)`* - the 16 characters hash string of the RTCP application to switch to. If not provided, the
+                          current global appID will be used.
+
+```js
+function unregisterDevice(app_id = undefined)
+```
+
+Unregisters a device from the backend. Use this method in multi-appID apps to unregister the device from a RTCP application.
+
+*Parameters*
+
+- `app_id` *`(String)`* - the 16 characters hash string of the RTCP application to unregister this device for.
+                          If not provided, the current global appID will be used.
 
 ## Reference - Inbox Module
 

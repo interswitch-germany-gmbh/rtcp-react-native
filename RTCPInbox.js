@@ -64,6 +64,7 @@ class RTCPInbox extends RTCPEvents {
 
         // --- Initializations ---
         RTCP.registerEventHandler("onRemoteNotification", (notification) => this._onRemoteNotification(notification));
+        RTCP.registerEventHandler("onChangeAppID", () => this._loadInboxFromStorage());
     }
 
     async syncInbox(force = false) {
@@ -170,14 +171,14 @@ class RTCPInbox extends RTCPEvents {
         RTCP.debugLog && this.log("Loading Inbox from storage");
 
         // get inbox and last sync time from storage
-        inboxString = await DefaultPreference.get("rtcp_inbox");
+        inboxString = await DefaultPreference.get("rtcp_inbox_" + RTCP.appID());
         if (inboxString) {
             this._inbox = JSON.parse(inboxString);
-            this._lastInboxSync = new Date(await DefaultPreference.get("rtcp_last_inbox_sync"));
+            this._lastInboxSync = new Date(await DefaultPreference.get("rtcp_last_inbox_sync_" + RTCP.appID()));
             this._inboxReady = true;
             this._emitEvent("onInboxUpdate", this._inbox);
         } else {
-            // inbox storage has not been initialized yet. Get messages from server in case this is a re-install
+            // inbox storage has not been initialized yet. Get messages from server in case this is a re-install or a new inbox
             this.syncInbox().catch(() => {});
         }
     }
@@ -185,8 +186,8 @@ class RTCPInbox extends RTCPEvents {
     async _writeInboxToStorage() {
         RTCP.debugLog && this.log("Writing Inbox to storage");
 
-        await DefaultPreference.set("rtcp_last_inbox_sync", this._lastInboxSync.toISOString());
-        await DefaultPreference.set("rtcp_inbox", JSON.stringify(this._inbox));
+        await DefaultPreference.set("rtcp_last_inbox_sync_" + RTCP.appID(), this._lastInboxSync.toISOString());
+        await DefaultPreference.set("rtcp_inbox_" + RTCP.appID(), JSON.stringify(this._inbox));
     }
 
     _startReadReceiptTimer(delay) {
