@@ -86,7 +86,7 @@ class RTCP extends RTCPEvents {
         // --- Initializations ---
 
         // get device id
-        this.hardware_id = DeviceInfo.getUniqueId();
+        this.hardware_id = DeviceInfo.getUniqueIdSync();
 
         // create notification channel (required for Android)
         this.createChannel({

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 / 2023-04-25
+
+* fix retrieval of hardware ID with newer versions of device-info
+
 ## 2.1.0 / 2023-01-26
 
 * Add possibility to use multiple appIDs in one app
