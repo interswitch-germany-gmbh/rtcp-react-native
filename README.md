@@ -158,6 +158,8 @@ This module uses the [@react-native-community/push-notification-ios](https://git
   - *Background Modes*, then tick *Remote notifications*
   - *Push Notifications*
 - Augment your Appdelegate  
+  
+  Objective-C (most common):
   - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
 
     ```obj-c
@@ -165,12 +167,21 @@ This module uses the [@react-native-community/push-notification-ios](https://git
     #import <UserNotifications/UNUserNotificationCenter.h>
     ```
 
+    For RN v0.71 and above:
+
+    ```obj-c
+    // --> add ' <UNUserNotificationCenterDelegate>' to this line
+    @interface AppDelegate : RCTAppDelegate <UNUserNotificationCenterDelegate>
+    ```
+
+    For RN v0.70 and below:
+
     ```obj-c
     // --> add ', UNUserNotificationCenterDelegate' to protocols in this line
     @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate, UNUserNotificationCenterDelegate>
     ```
 
-  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.m`
+  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.m` or `/ios/<yourReactNativeProject>/AppDelegate.mm`
 
     ```obj-c
     // --> add this to the top of the file
@@ -213,6 +224,53 @@ This module uses the [@react-native-community/push-notification-ios](https://git
       [RTCP didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
     }
     // @end
+    ```
+
+  Swift - if you migrated your AppDelegate to Swift:
+  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.swift`
+
+    ```swift
+    // --> add this to the top of the file
+    @import RTCP
+    ```
+
+    ```swift
+    // --> add ', UNUserNotificationCenterDelegate' to protocols in this line
+    class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    ```
+
+    ```swift
+    // func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    //   ...
+      // --> add the following two lines before "return true" in the "didFinishLaunchingWithOptions" application method
+      RTCP.didFinishLaunching(withOptions: [UIApplication.LaunchOptionsKey: Any]())
+      UNUserNotificationCenter.current().delegate = self
+    //
+    //   return true
+    // }  
+    ```
+
+    ```swift
+    // --> add these lines (before '}' (end of class) at the end of the file)
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data ) {
+      RTCP.didRegisterForRemoteNotifications(withDeviceToken: deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+      RTCP.didFailToRegisterForRemoteNotifications(withError: error)
+    }
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+      RTCP.didReceiveRemoteNotification(userInfo, fetchCompletionHandler: completionHandler)
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+      completionHandler( [.alert, .badge, .sound])
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+      RTCP.didReceiveNotificationResponse(response, withCompletionHandler: completionHandler)
+    }
     ```
 
 In order to enable extended features like Rich Push and Delivery Status you need to set up a *Notification Service Extension* in your project:
