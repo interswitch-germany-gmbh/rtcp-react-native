@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.2 / 2023-06-15
+
+* fix bug in unregisterDevice
+* Add support for RN 0.71
+
 ## 2.1.1 / 2023-04-25
 
 * fix retrieval of hardware ID with newer versions of device-info
