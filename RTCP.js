@@ -172,7 +172,7 @@ class RTCP extends RTCPEvents {
     }
 
     async unregisterDevice(app_id = undefined) {
-        if (await RTCPApi.unregisterDevice({ device: { hardware_id: this.hardware_id } }, app_id)) {
+        if (await RTCPApi.unregisterDevice({ hardware_id: this.hardware_id }, app_id)) {
             DefaultPreference.clear("rtcp_device" + (app_id ? "_" + app_id : ""));
         }
     }
