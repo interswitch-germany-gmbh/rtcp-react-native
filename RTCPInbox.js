@@ -195,7 +195,8 @@ class RTCPInbox extends RTCPEvents {
         if (this._readReceiptTimer != null) {
             clearTimeout(this._readReceiptTimer);
             this._readReceiptTimer = null;
-            AppState.removeEventListener("change", this._sendReceiptsOnAppClose);
+            if (AppState.removeEventListener) AppState.removeEventListener("change", this._sendReceiptsOnAppClose);  // RN <=0.64 compatibility
+            else this.appStateChangeEventSubscription?.remove();
         }
 
         // start new timer
@@ -203,11 +204,12 @@ class RTCPInbox extends RTCPEvents {
             await RTCP.sendReadReceipt(this._readReceiptQueue);
             this._readReceiptQueue = [];
             this._readReceiptTimer = null;
-            AppState.removeEventListener("change", this._sendReceiptsOnAppClose);
+            if (AppState.removeEventListener) AppState.removeEventListener("change", this._sendReceiptsOnAppClose);  // RN <=0.64 compatibility
+            else this.appStateChangeEventSubscription?.remove();
         }, delay);
 
         if (delay > 0) {
-            AppState.addEventListener("change", this._sendReceiptsOnAppClose);
+            this.appStateChangeEventSubscription = AppState.addEventListener("change", this._sendReceiptsOnAppClose);
         }
     }
 
