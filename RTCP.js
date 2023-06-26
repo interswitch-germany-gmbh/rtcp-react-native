@@ -86,7 +86,10 @@ class RTCP extends RTCPEvents {
         // --- Initializations ---
 
         // get device id
-        this.hardware_id = DeviceInfo.getUniqueIdSync();
+        // not using 'getUniqueIdSync' for two reasons:
+        // - it doesn't exist in react-native-device-info < 10.0
+        // - it seems to break Chrome debugging (https://github.com/react-native-device-info/react-native-device-info/issues/776)
+        this.hardware_id = await DeviceInfo.getUniqueId();
 
         // create notification channel (required for Android)
         this.createChannel({
