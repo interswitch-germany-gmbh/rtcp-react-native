@@ -29,6 +29,8 @@
 - [Reference - Ads Components](#reference---ads-components)
   - [RTCPAdImage](#rtcpadimage)
   - [RTCPAdsCarousel](#rtcpadscarousel)
+- [Troubleshooting](#troubleshooting)
+  - [Runtime permission introduced in Android 13](#runtime-permission-introduced-in-android-13)
 
 ## About
 
@@ -119,6 +121,8 @@ This module uses the [react-native-push-notification](https://github.com/zo0r/re
 
   ```xml
   <manifest ...
+      <!-- required for API Level >= 33 (Android 13) -->
+      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
       ...
       <application ...
       ...
@@ -608,6 +612,9 @@ Handle Deep Links when a user taps a notification with a Deep Link attached (i.e
 * **`autoRegister`** *`(Boolean) - optional, default: true`*  
 Automatically register with backend when push token has been received.
 
+* **`requestPermissions`** *`(Boolean) - optional, default: true`*  
+Request for notification permissions on initialization. If set to `false` you'll have to call `requestNotificationPermissions()` manually.
+
 
 ### Methods
 
@@ -709,6 +716,17 @@ Removes a `handler` function from the `event` list.
   *Function parameters*  
   - `newAppID` *(String)* - the new appID the SDK has been set to
   - `oldAppID` *(String)* - the appID the SDK had used before
+
+```js
+async function requestNotificationPermissions(rationale = undefined)
+```
+
+Request user permission to receive notifications (iOS and Android API level >= 33 (Android 13)). If `requestPermissions` is true (default) this will be called automatically on initialization.
+
+*Parameters*
+
+- `rationale` *`(Object)`* - Rationale to be shown no Android as defined in [React Native Docs](https://reactnative.dev/docs/permissionsandroid#request)
+
 
 ### Advanced Methods
 
@@ -923,3 +941,30 @@ This component is based on a `FlatList` with `RTCPAdImage`s as horizontal items.
 
 - **`itemProps`** *`(Object), default: undefined`*  
   Props to forward to each image component.
+
+
+## Troubleshooting
+
+### Runtime permission introduced in Android 13
+
+Starting with Android 13 showing notifications requires the user to explicitly grant permission through a popup dialog (see [Android Documentation](https://developer.android.com/develop/ui/views/notifications/notification-permission)). For this a new permission called `POST_NOTIFICATIONS` was introduced. Its definition has been added to React Native in version 0.70.7. If your API level is >= 33 using older versions with this module will generate an error.
+
+To make it work with lower versions, you can manually add the permission definition to your React Native installation like this:
+
+Modify file `node_modules/react-native/Libraries/PermissionsAndroid/NativePermissionsAndroid.js`:
+
+```js
+export type PermissionType =
+  | 'android.permission.POST_NOTIFICATIONS'  // <- add this line
+  | 'android.permission.READ_CALENDAR'
+```
+
+and file `node_modules/react-native/Libraries/PermissionsAndroid/PermissionsAndroid.js`:
+
+```js
+const PERMISSIONS = Object.freeze({
+  POST_NOTIFICATIONS: 'android.permission.POST_NOTIFICATIONS',  // <- add this line
+  READ_CALENDAR: 'android.permission.READ_CALENDAR',
+```
+
+There's a [ready-to-use patch](examples/react-native.patch) available in the examples folder. It can also be used with the [patch-package](https://github.com/ds300/patch-package/) module, simply copy the file to `patches/react-native+<your-rn-version>.patch`.
