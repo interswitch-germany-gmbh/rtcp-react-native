@@ -222,6 +222,9 @@ class RTCP extends RTCPEvents {
     }
 
     async _onRTCPNotification(notification) {
+        // get hardware_id in case register event occurred before initialization finished
+        if (!this.hardware_id) this.hardware_id_id = await DeviceInfo.getUniqueId();
+
         if (notification.userInteraction === false) {
             // received a remote notification
             if (notification.data.app_data) {
