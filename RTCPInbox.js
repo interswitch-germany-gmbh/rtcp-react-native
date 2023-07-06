@@ -122,8 +122,9 @@ class RTCPInbox extends RTCPEvents {
     async _onRemoteNotification(notification) {
         // on Android manage inbox on incoming message
         if (Platform.OS === "android") {
-            if (!this._inboxReady) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+            let count = 0;
+            while (!this._inboxReady && count++ < 5) {
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
             let data = notification.data;
 
