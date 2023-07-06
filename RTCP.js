@@ -152,38 +152,37 @@ class RTCP extends RTCPEvents {
     }
 
     async registerDevice(app_id = undefined) {
-        if (!this.token) {
-            this.log("Unable to register as token is unset.");
-            return;
-        }
-
-        // create device registration data
-        let device = {
-            hardware_id: this.hardware_id,
-            push_token: this.token,
-            platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
-            device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
-            api_version: "2",
-            sdk_version: SDK_VERSION,
-            tags: { app_version: DeviceInfo.getVersion() }
-        };
-        let deviceJson = JSON.stringify(device);
-
         let oldAppID = RTCPApi.appID;
         if (app_id) RTCPApi.appID = app_id;  // change appID globally if provided
         let pref_key = "rtcp_device" + (app_id ? "_" + app_id : "");  // store individually for app_id if provided
 
-        // check if registration data has changed. if not, do not register again to reduce server load
-        const registeredDevice = await DefaultPreference.get(pref_key);
-        if (registeredDevice === null || registeredDevice !== deviceJson) {
-            // send registration to RTCP
-            if (await RTCPApi.registerDevice(device)) {
-                // store device data for later comparison
-                await DefaultPreference.set(pref_key, deviceJson);
-                this._emitEvent("onRegister");
+        if (this.token) {
+            // create device registration data
+            let device = {
+                hardware_id: this.hardware_id,
+                push_token: this.token,
+                platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
+                device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
+                api_version: "2",
+                sdk_version: SDK_VERSION,
+                tags: { app_version: DeviceInfo.getVersion() }
+            };
+            let deviceJson = JSON.stringify(device);
+
+            // check if registration data has changed. if not, do not register again to reduce server load
+            const registeredDevice = await DefaultPreference.get(pref_key);
+            if (registeredDevice === null || registeredDevice !== deviceJson) {
+                // send registration to RTCP
+                if (await RTCPApi.registerDevice(device)) {
+                    // store device data for later comparison
+                    await DefaultPreference.set(pref_key, deviceJson);
+                    this._emitEvent("onRegister", RTCPApi.appID);
+                }
+            } else {
+                this.log("Device data and token are unchanged, not sending registration to RTCP Server" + (app_id ? " for appID " + app_id : ""));
             }
         } else {
-            this.log("Device data and token are unchanged, not sending registration to RTCP Server" + (app_id ? " for appID " + app_id : ""));
+            this.log("Token is unset, not sending registration.");
         }
 
         if (app_id && RTCPApi.appID !== oldAppID) this._emitEvent("onChangeAppID", RTCPApi.appID, oldAppID);
