@@ -17,7 +17,6 @@ import RNCPushNotificationIOS
     }
 
     @objc public class func didReceiveRemoteNotification(_ userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-
         var delay = 0.0;
         if UIApplication.shared.applicationState == .background {
             // delay execution to give app time to start up when killed
@@ -28,6 +27,10 @@ import RNCPushNotificationIOS
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             RNCPushNotificationIOS.didReceiveRemoteNotification(userInfo, fetchCompletionHandler:completionHandler)
         }
+    }
+
+    @objc public class func didReceiveRemoteNotification(_ userInfo: [AnyHashable : Any]) {
+        RNCPushNotificationIOS.didReceiveRemoteNotification(userInfo)
     }
 
     @objc public class func didFinishLaunching(withOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]) {

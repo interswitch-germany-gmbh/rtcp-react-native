@@ -209,6 +209,8 @@ This module uses the [@react-native-community/push-notification-ios](https://git
     ```obj-c
     // --> add these lines (before "@end" at the end of the file)
     - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+        NSDictionary *userInfo = notification.request.content.userInfo;
+        [RTCP didReceiveRemoteNotification:userInfo];
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
       }
 
