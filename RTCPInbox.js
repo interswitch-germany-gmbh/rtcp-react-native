@@ -33,9 +33,9 @@ class RTCPInbox extends RTCPEvents {
         if (Platform.OS === "ios") await DefaultPreference.set("rtcp_enable_badge", this.enableBadge.toString()); // store in userdefaults for NSE
 
         // update badge and write inbox to storage on changes
-        if (this.enableBadge) this.registerEventHandler("onInboxUpdate", () => {
+        if (this.enableBadge) this.registerEventHandler("onInboxUpdate", (inbox, fromStorage) => {
           PushNotification.setApplicationIconBadgeNumber(this.getUnreadCount());
-          this._writeInboxToStorage();
+          if (!fromStorage) this._writeInboxToStorage(); // don't write to storage if it has just been loaded from
         });
 
         // inboxSize
@@ -122,10 +122,14 @@ class RTCPInbox extends RTCPEvents {
     async _onRemoteNotification(notification) {
         // on Android manage inbox on incoming message
         if (Platform.OS === "android") {
-            if (!this._inboxReady) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+            let count = 0;
+            while (!this._inboxReady && count++ < 5) {
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
             let data = notification.data;
+
+            let isForeignInbox = (data.app_id && data.app_id != RTCP.appID());
+            let inbox = isForeignInbox ? (JSON.parse(await DefaultPreference.get("rtcp_inbox_" + data.app_id)) || []) : this._inbox;
 
             if (data.revoke || (data.message && !data.not_in_inbox)) {
                 // received a new notification. add it to inbox
@@ -133,31 +137,30 @@ class RTCPInbox extends RTCPEvents {
                 data.read = false;
 
                 if (data.revoke) {
-                    let index = this._inbox.findIndex((notification) => notification.push_id === data.revoke);
+                    let index = inbox.findIndex((notification) => notification.push_id === data.revoke);
                     if (index >= 0) {
-                        this.log("Removing inbox item:", this._inbox[index]);
-                        this._inbox.splice(index, 1);
-                        this._emitEvent("onInboxUpdate", this._inbox);
+                        this.log("Removing inbox item:", inbox[index]);
+                        inbox.splice(index, 1);
                     } else {
                         this.log("Notification to be revoked not found in inbox:", data.revoke);
                         return;
                     }
                 } else if (data.replace) {
-                    let index = this._inbox.findIndex((notification) => notification.push_id === data.replace);
+                    let index = inbox.findIndex((notification) => notification.push_id === data.replace);
                     if (index >= 0) {
-                        this.log("Replacing inbox item:", this._inbox[index], "with:", data);
-                        this._inbox[index] = data;
-                        this._emitEvent("onInboxUpdate", this._inbox);
+                        this.log("Replacing inbox item:", inbox[index], "with:", data);
+                        inbox[index] = data;
                     } else {
                         this.log("Notification to be replaced not found in inbox:", data.replace);
                         return;
                     }
                 } else {
                     this.log("Adding new notification to inbox:", data);
-                    this._inbox.unshift(data);
-                    if (this._inbox.length > this.inboxSize) this._inbox.length = this.inboxSize; // limit inbox to max size
-                    this._emitEvent("onInboxUpdate", this._inbox);
+                    inbox.unshift(data);
+                    if (inbox.length > this.inboxSize) inbox.length = this.inboxSize; // limit inbox to max size
                 }
+                if (isForeignInbox) await DefaultPreference.set("rtcp_inbox_" + data.app_id, JSON.stringify(inbox));
+                else this._emitEvent("onInboxUpdate", this._inbox);
             }
         }
 
@@ -176,7 +179,7 @@ class RTCPInbox extends RTCPEvents {
             this._inbox = JSON.parse(inboxString);
             this._lastInboxSync = new Date(await DefaultPreference.get("rtcp_last_inbox_sync_" + RTCP.appID()));
             this._inboxReady = true;
-            this._emitEvent("onInboxUpdate", this._inbox);
+            this._emitEvent("onInboxUpdate", this._inbox, true);
         } else {
             // inbox storage has not been initialized yet. Get messages from server in case this is a re-install or a new inbox
             this.syncInbox().catch(() => {});

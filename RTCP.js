@@ -6,7 +6,7 @@ import DeviceInfo from "react-native-device-info";
 import { Platform, AppState, Linking } from "react-native";
 import DefaultPreference from "react-native-default-preference";
 
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, PermissionsAndroid } from 'react-native';
 
 import { version as SDK_VERSION } from "./package.json";
 
@@ -62,6 +62,54 @@ class RTCP extends RTCPEvents {
         // clearAfter: boolean, default: true
         this.clearAfter = typeof options.clearAfter !== "undefined" ? options.clearAfter : 2000;
 
+        // openURL: boolean, default: true
+        this.openURL = typeof options.openURL !== "undefined" ? options.openURL : true;
+
+        // deepLinking: boolean, default: true
+        this.deepLinking = typeof options.deepLinking !== "undefined" ? options.deepLinking : true;
+
+        // requestPermission: boolean, default: true
+        this.optionRequestPermissions = typeof options.requestPermissions !== "undefined" ? options.requestPermissions : true;
+
+        // --- Initializations ---
+
+        // initialize push notifications module
+        // attention: this needs to happen before any blocking functions (await)
+        this.configure({
+            onRegister: (token) => {
+                this._onRTCPRegister(token);
+            },
+            onNotification: (notification) => {
+                this._onRTCPNotification(notification);
+            },
+            requestPermissions: false  // we'll do this later ourselves with Android >=13 compatibility
+        });
+
+        // create notification channel (required for Android)
+        this.createChannel({
+            channelId: "push-channel",
+            channelName: typeof options.channelName !== "undefined" ? options.channelName : "Push Notifications",
+            soundName: "default",
+            importance: 4,
+            vibrate: true
+        });
+
+        // get device id
+        // not using 'getUniqueIdSync' for two reasons:
+        // - it doesn't exist in react-native-device-info < 10.0
+        // - it seems to break Chrome debugging (https://github.com/react-native-device-info/react-native-device-info/issues/776)
+        this.hardware_id = await DeviceInfo.getUniqueId();
+
+        // Android 13 introduced showing notifications as 'dangerous' permission that requires 'runtime permission'. Check for RN compatibility.
+        if ((Platform.OS === "android" && DeviceInfo.getApiLevelSync() >= 33) && !PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS) {
+            throw 'Unable to initialize RTCP! Using API level >= 33 requires RN >= 0.70.7 for notifications to display.'
+            + ' If you cannot update your RN version currently, check the README for a workaround.'
+        }
+        // requestPermission: boolean, default: true
+        if (typeof options.requestPermissions !== "undefined" ? options.requestPermissions : true) {
+            this.requestNotificationPermissions();
+        }
+
         // clearOnStart: boolean, default: true
         if (typeof options.clearOnStart !== "undefined" ? options.clearOnStart : false) {
             AppState.addEventListener("change", (nextAppState) => {
@@ -76,36 +124,6 @@ class RTCP extends RTCPEvents {
                 }
             });
         }
-
-        // openURL: boolean, default: true
-        this.openURL = typeof options.openURL !== "undefined" ? options.openURL : true;
-
-        // deepLinking: boolean, default: true
-        this.deepLinking = typeof options.deepLinking !== "undefined" ? options.deepLinking : true;
-
-        // --- Initializations ---
-
-        // get device id
-        this.hardware_id = DeviceInfo.getUniqueIdSync();
-
-        // create notification channel (required for Android)
-        this.createChannel({
-            channelId: "push-channel",
-            channelName: typeof options.channelName !== "undefined" ? options.channelName : "Push Notifications",
-            soundName: "default",
-            importance: 4,
-            vibrate: true
-        });
-
-        // initialize push notifications module
-        this.configure({
-            onRegister: (token) => {
-                this._onRTCPRegister(token);
-            },
-            onNotification: (notification) => {
-                this._onRTCPNotification(notification);
-            }
-        });
 
         // iOS only: store app and device info in UserDefaults for Notification Service Extension
         if (Platform.OS === "ios") {
@@ -134,38 +152,37 @@ class RTCP extends RTCPEvents {
     }
 
     async registerDevice(app_id = undefined) {
-        if (!this.token) {
-            this.log("Unable to register as token is unset.");
-            return;
-        }
-
-        // create device registration data
-        let device = {
-            hardware_id: this.hardware_id,
-            push_token: this.token,
-            platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
-            device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
-            api_version: "2",
-            sdk_version: SDK_VERSION,
-            tags: { app_version: DeviceInfo.getVersion() }
-        };
-        let deviceJson = JSON.stringify(device);
-
         let oldAppID = RTCPApi.appID;
         if (app_id) RTCPApi.appID = app_id;  // change appID globally if provided
         let pref_key = "rtcp_device" + (app_id ? "_" + app_id : "");  // store individually for app_id if provided
 
-        // check if registration data has changed. if not, do not register again to reduce server load
-        const registeredDevice = await DefaultPreference.get(pref_key);
-        if (registeredDevice === null || registeredDevice !== deviceJson) {
-            // send registration to RTCP
-            if (await RTCPApi.registerDevice(device)) {
-                // store device data for later comparison
-                await DefaultPreference.set(pref_key, deviceJson);
-                this._emitEvent("onRegister");
+        if (this.token) {
+            // create device registration data
+            let device = {
+                hardware_id: this.hardware_id,
+                push_token: this.token,
+                platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
+                device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
+                api_version: "2",
+                sdk_version: SDK_VERSION,
+                tags: { app_version: DeviceInfo.getVersion() }
+            };
+            let deviceJson = JSON.stringify(device);
+
+            // check if registration data has changed. if not, do not register again to reduce server load
+            const registeredDevice = await DefaultPreference.get(pref_key);
+            if (registeredDevice === null || registeredDevice !== deviceJson) {
+                // send registration to RTCP
+                if (await RTCPApi.registerDevice(device)) {
+                    // store device data for later comparison
+                    await DefaultPreference.set(pref_key, deviceJson);
+                    this._emitEvent("onRegister", RTCPApi.appID);
+                }
+            } else {
+                this.log("Device data and token are unchanged, not sending registration to RTCP Server" + (app_id ? " for appID " + app_id : ""));
             }
         } else {
-            this.log("Device data and token are unchanged, not sending registration to RTCP Server" + (app_id ? " for appID " + app_id : ""));
+            this.log("Token is unset, not sending registration.");
         }
 
         if (app_id && RTCPApi.appID !== oldAppID) this._emitEvent("onChangeAppID", RTCPApi.appID, oldAppID);
@@ -177,15 +194,36 @@ class RTCP extends RTCPEvents {
         }
     }
 
+    async requestNotificationPermissions(rationale = undefined) {
+        if (Platform.OS === "android" && DeviceInfo.getApiLevelSync() >= 33) {
+            try {
+                if ((await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, rationale)) !== PermissionsAndroid.RESULTS.GRANTED) {
+                    this.log("Permission to show notifications not granted!");
+                } else {
+                    this._requestPermissions();
+                }
+            } catch (err) {
+                this.log("Error requesting for permission to show notifications.");
+            }
+        } else {
+            this._requestPermissions();
+        }
+    }
+
     // --- private methods ---
 
     async _onRTCPRegister(token) {
+        // get hardware_id in case register event occurred before initialization finished
+        if (!this.hardware_id) this.hardware_id_id = await DeviceInfo.getUniqueId();
         this.log("Registered with FCM/APNs. hardware_id:", this.hardware_id, "token:", token.token);
         this.token = token.token;
         if (this.autoRegister) await this.registerDevice();
     }
 
     async _onRTCPNotification(notification) {
+        // get hardware_id in case register event occurred before initialization finished
+        if (!this.hardware_id) this.hardware_id_id = await DeviceInfo.getUniqueId();
+
         if (notification.userInteraction === false) {
             // received a remote notification
             if (notification.data.app_data) {
