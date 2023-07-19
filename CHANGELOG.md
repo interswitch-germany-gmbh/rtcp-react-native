@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 / 2023-07-19
+
+* Add support for Android 13 / API Level >= 33 (runtime permission for notifications)
+* Various bugfixes. Please see [updated README](https://github.com/interswitch-germany-gmbh/rtcp-react-native/blob/f4e29eec697681b9226dc0110b93b818424f6c27/README.md?plain=1#L212) for augmenting AppDelegate on iOS and adjust accordingly!
+
 ## 2.1.2 / 2023-06-15
 
 * fix bug in unregisterDevice
