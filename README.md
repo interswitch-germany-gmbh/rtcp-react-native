@@ -67,10 +67,10 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  yarn add react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
 
   # using npm
-  npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  npm install react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
   ```
 
 ### Android Setup
@@ -80,6 +80,7 @@ Set up your app for use with Google Firebase Cloud Messaging. See the [official 
 - If not done for your app already, sign in to [Firebase Console](console.firebase.google.com), create a Firebase project and register your app.
 - Download the `google-services.json` file and put it into the folder `/android/app/` of your React Native app.
 - Follow the Gradle instructions to integrate the Firebase SDK
+
   - Add the Google Services Gradle plugin to your app
 
     in `/android/build.gradle`:
@@ -138,8 +139,8 @@ This module uses the [react-native-push-notification](https://github.com/zo0r/re
 
 This module uses the [@react-native-community/push-notification-ios](https://github.com/react-native-push-notification-ios/push-notification-ios) module for iOS. Setup slightly differs from their instructions.
 
-- Adjust your `/ios/Podfile` to create module headers for *push-notification-ios*:
-  
+- Adjust your `/ios/Podfile` to create module headers for _push-notification-ios_:
+
   ```ruby
   ...
   target '<yourReactNativeProject>' do
@@ -159,11 +160,12 @@ This module uses the [@react-native-community/push-notification-ios](https://git
   ```
 
 - Open your .xcworkspace in XCode. Add the following capabilities under "Signing & Capabilities":
-  - *Background Modes*, then tick *Remote notifications*
-  - *Push Notifications*
-- Augment your Appdelegate  
-  
+  - _Background Modes_, then tick _Remote notifications_
+  - _Push Notifications_
+- Augment your Appdelegate
+
   Objective-C (most common):
+
   - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
 
     ```obj-c
@@ -203,7 +205,7 @@ This module uses the [@react-native-community/push-notification-ios](https://git
       center.delegate = self;
     //
     //   return YES;
-    // }  
+    // }
     ```
 
     ```obj-c
@@ -233,6 +235,7 @@ This module uses the [@react-native-community/push-notification-ios](https://git
     ```
 
   Swift - if you migrated your AppDelegate to Swift:
+
   - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.swift`
 
     ```swift
@@ -253,7 +256,7 @@ This module uses the [@react-native-community/push-notification-ios](https://git
       UNUserNotificationCenter.current().delegate = self
     //
     //   return true
-    // }  
+    // }
     ```
 
     ```swift
@@ -279,16 +282,17 @@ This module uses the [@react-native-community/push-notification-ios](https://git
     }
     ```
 
-In order to enable extended features like Rich Push and Delivery Status you need to set up a *Notification Service Extension* in your project:
+In order to enable extended features like Rich Push and Delivery Status you need to set up a _Notification Service Extension_ in your project:
 
 - Add a Notification Service Extension:
-  - Open your .xcworkspace. In the menu select *File -> New -> Target...*
-  - Choose *Notification Service Extension*
-  - For *Product Name* enter: `RTCPNotificationServiceExtension`
-  - Ensure `Swift` is selected as *Language*
-  - Choose *Finish*. At the following popup dialog do not activate the scheme, click *Cancel* instead
-  - Select the new target `RTCPNotificationServiceExtension` in the *Project and Targets list*, go to *General*. Under *Deployment Info* choose: `iOS 10.0`
-  - In *Project Explorer* open `RTCPNotificationServiceExtension/NotificationService.swift` and replace its entire content with:
+
+  - Open your .xcworkspace. In the menu select _File -> New -> Target..._
+  - Choose _Notification Service Extension_
+  - For _Product Name_ enter: `RTCPNotificationServiceExtension`
+  - Ensure `Swift` is selected as _Language_
+  - Choose _Finish_. At the following popup dialog do not activate the scheme, click _Cancel_ instead
+  - Select the new target `RTCPNotificationServiceExtension` in the _Project and Targets list_, go to _General_. Under _Deployment Info_ choose: `iOS 12.0`
+  - In _Project Explorer_ open `RTCPNotificationServiceExtension/NotificationService.swift` and replace its entire content with:
 
     ```swift
     import UserNotifications
@@ -305,21 +309,24 @@ In order to enable extended features like Rich Push and Delivery Status you need
     }
     ```
 
-- Add an *App Group* to both the extension and the main app:
-  - Under *TARGETS* select your main app and go to *Signing & Capabilities*
-  - Add the capability *App Group*
-  - Under the appearing *App Groups* add an App Group with the following name:
+- Add an _App Group_ to both the extension and the main app:
+
+  - Under _TARGETS_ select your main app and go to _Signing & Capabilities_
+  - Add the capability _App Group_
+  - Under the appearing _App Groups_ add an App Group with the following name:
 
     ```text
     group.<your_bundle_id>.rtcp
     ```
 
-    Hint: your bundle ID is shown right above under *Signing -> Bundle Identifier*
+    Hint: your bundle ID is shown right above under _Signing -> Bundle Identifier_
 
-  - Under *TARGETS* now select the Extension `RTCPNotificationServiceExtension`
-  - Add the capability *App Group* here as well
-  - Under the shown list of *App Groups* tick the very same app group created above
+  - Under _TARGETS_ now select the Extension `RTCPNotificationServiceExtension`
+  - Add the capability _App Group_ here as well
+  - Under the shown list of _App Groups_ tick the very same app group created above
+
 - Add the RTCP library Pod to the Notification Service Extension target:
+
   - Add this to the end of your Podfile at `/ios/Podfile`:
 
     ```ruby
@@ -344,40 +351,40 @@ Import and initialize the core module in your application's main file:
 > ❗ Make sure to initialize this module **before you register your root component with** `AppRegistry.registerComponent('Appname', () => App);`!
 
 ```javascript
-import RTCP from 'rtcp-react-native';
+import RTCP from "rtcp-react-native";
 
 // do this outside of any component
 RTCP.init({
-  appID: __DEV__ ? '1234567890abcdef' : 'fedcba0987654321', // <-- mandatory parameter
-  production: !__DEV__
+  appID: __DEV__ ? "1234567890abcdef" : "fedcba0987654321", // <-- mandatory parameter
+  production: !__DEV__,
 });
 ```
 
-`rtcp-react-native` ships with an additional `RTCPInbox` module that manages an *In-App-Notifications-Inbox* and its synchronization with the RTCP Server for you. If you like to use the integrated inbox, initialize it and ensure this happens *after* the main initialization has finished:
+`rtcp-react-native` ships with an additional `RTCPInbox` module that manages an _In-App-Notifications-Inbox_ and its synchronization with the RTCP Server for you. If you like to use the integrated inbox, initialize it and ensure this happens _after_ the main initialization has finished:
 
 ```javascript
-import RTCP from 'rtcp-react-native';
-import RTCPInbox from 'rtcp-react-native/RTCPInbox';
+import RTCP from "rtcp-react-native";
+import RTCPInbox from "rtcp-react-native/RTCPInbox";
 
 RTCP.init({
-  appID: __DEV__ ? '1234567890abcdef' : 'fedcba0987654321',
+  appID: __DEV__ ? "1234567890abcdef" : "fedcba0987654321",
   production: !__DEV__,
   // ... possibly more options
 }).then(() =>
   RTCPInbox.init({
-    inboxSize: 25
-  }),
+    inboxSize: 25,
+  })
 );
 ```
 
-With the rtcp-react-native module there is no difference in notification appearance if your app is in foreground or in background. Push notifications will always be shown as *heads-up notification*, even with the app in foreground.
+With the rtcp-react-native module there is no difference in notification appearance if your app is in foreground or in background. Push notifications will always be shown as _heads-up notification_, even with the app in foreground.
 
 If a user taps on a notification, you can react to that by registering to the `onNotificationTapped` event:
 
 ```js
 RTCP.registerEventHandler("onNotificationTapped", (notification) => {
   // when user taps a notification, go to inbox screen
-  this.props.navigation.navigate("inboxScreen")
+  this.props.navigation.navigate("inboxScreen");
 });
 ```
 
@@ -404,7 +411,7 @@ Here is a sample notification object:
 The Core Module copies all methods from `react-native-push-notification`, so all functions listed [there](https://github.com/zo0r/react-native-push-notification#local-notifications) can be used directly. Example:
 
 ```js
-import RTCP from 'rtcp-react-native';
+import RTCP from "rtcp-react-native";
 
 RTCP.removeAllDeliveredNotifications();
 ```
@@ -413,7 +420,7 @@ RTCP.removeAllDeliveredNotifications();
 
 Deep Linking is enabled by default and can be disabled via the init parameter `deepLinking`.
 
-When a notification containing a Deep Link is tapped, the `'url'` event is emitted the same way React Native's `Linking` class does when the app is opened via Deep Linking. 
+When a notification containing a Deep Link is tapped, the `'url'` event is emitted the same way React Native's `Linking` class does when the app is opened via Deep Linking.
 
 If Deep Linking is set up in `react-navigation`, it listens to this event by default. Therefore, it will behave just like when a Deep Link is opened from a browser with no extra code being required.
 
@@ -421,21 +428,21 @@ To target Deep Links from the backend you need to upload a definition in JSON fo
 
 ```json
 [
-   {
-      "path":"myapp://quicktransfer",
-      "description":"Quicktransfer",
-      "params":{
-         "pin":"PIN"
-      }
-   },
-   {
-      "path":"myapp://quickqr/:foo/:bar?",
-      "description":"Quick QR",
-      "params":{
-         ":foo":"Foo Parameter",
-         ":bar?":"Bar Parameter"
-      }
-   }
+  {
+    "path": "myapp://quicktransfer",
+    "description": "Quicktransfer",
+    "params": {
+      "pin": "PIN"
+    }
+  },
+  {
+    "path": "myapp://quickqr/:foo/:bar?",
+    "description": "Quick QR",
+    "params": {
+      ":foo": "Foo Parameter",
+      ":bar?": "Bar Parameter"
+    }
+  }
 ]
 ```
 
@@ -476,7 +483,7 @@ export default class Notifications extends Component {
         <Text style={styles.myheader}>Notifications</Text>
         <RTCPInboxList />
       </View>
-    )
+    );
   }
 }
 ```
@@ -486,7 +493,7 @@ For the list's `renderItem` a custom component called `RTCPInboxNotification` is
 
 #### Customization
 
-`RTCPInboxList` is highly customizable to fit the styling needs of all types of apps. 
+`RTCPInboxList` is highly customizable to fit the styling needs of all types of apps.
 It comes with a set of default styles defined in [styles.js](styles.js) which are applied to the various items within `RTCPNotification` and `RTCPNotificationBack` and can be overridden by providing an object to the `styles` prop.
 
 > ❗ Please note that provided styles get merged with existing default styles, so in order to unset a default style property you have to override it. See [styles.js](styles.js) for which properties are set by default.
@@ -497,16 +504,20 @@ See simplified pseudo-code below for layout and stylings of a notification:
 
 ```jsx
 // RTCPNotification
-<View> {/* styles.notification, styles.notificationUnread */}
+<View>
+  {" "}
+  {/* styles.notification, styles.notificationUnread */}
   <View>
-    <Text>{headerText}</Text>  {/* styles.header, styles.headerUnread */}
-    <Text>{item.title}</Text>  {/* styles.title, styles.titleUnread} */}
+    <Text>{headerText}</Text> {/* styles.header, styles.headerUnread */}
+    <Text>{item.title}</Text> {/* styles.title, styles.titleUnread} */}
     <Text>{item.message}</Text> {/* styles.message, styles.messageUnread */}
     <Text>{item.link}</Text> {/* styles.link */}
   </View>
   <View>
     <FastImage source={{ uri: item.image }} /> {/* styles.image */}
-    <Modal> {/* Modal for fullscreen image */}
+    <Modal>
+      {" "}
+      {/* Modal for fullscreen image */}
       <View>
         <FastImage source={{ uri: item.image }} /> {/* styles.fsImage */}
       </View>
@@ -517,8 +528,12 @@ See simplified pseudo-code below for layout and stylings of a notification:
 
 ```jsx
 // RTCPNotificationBack
-<View> {/* styles.hiddenItem */}
-  <View> {/* styles.deleteView */}
+<View>
+  {" "}
+  {/* styles.hiddenItem */}
+  <View>
+    {" "}
+    {/* styles.deleteView */}
     <Text>Delete</Text> {/* styles.deleteText */}
   </View>
 </View>
@@ -538,15 +553,21 @@ import moment from "moment";
 ```
 
 For the fullscreen image that is shown in a `Modal` when the user taps on the image, it is possible
- to provide a custom component by providing a function through the `renderFsImage` prop. This allows to adjust the image presentation and a possible 'Back' button to the app's stylings. The function takes the `item` and a function to be called to close the modal as arguments. Example:
+to provide a custom component by providing a function through the `renderFsImage` prop. This allows to adjust the image presentation and a possible 'Back' button to the app's stylings. The function takes the `item` and a function to be called to close the modal as arguments. Example:
 
 ```jsx
 <RTCPInboxList
   renderFsImage={(item, close) => (
     <View>
-      <FastImage style={{width: '100%', height: '100%', resizeMode: 'contain'}} source={{uri: item.image}} />
-      <TouchableOpacity style={{position: "absolute", top: 0, left: 0}} onPress={() => close()}>
-        <Text style={{padding: 10, color: 'yellow'}}>❮ Back</Text>
+      <FastImage
+        style={{ width: "100%", height: "100%", resizeMode: "contain" }}
+        source={{ uri: item.image }}
+      />
+      <TouchableOpacity
+        style={{ position: "absolute", top: 0, left: 0 }}
+        onPress={() => close()}
+      >
+        <Text style={{ padding: 10, color: "yellow" }}>❮ Back</Text>
       </TouchableOpacity>
     </View>
   )}
@@ -587,36 +608,35 @@ import { RTCPAdImage, RTCPAdsCarousel } from 'rtcp-react-native/RTCPAds';
 
 ### Configuration
 
-* **`appID`** *`(String) - mandatory`*  
-The 16 characters hash string of your application in RTCP
+- **`appID`** _`(String) - mandatory`_  
+  The 16 characters hash string of your application in RTCP
 
-* **`production`** *`(Boolean) - optional, default: false`*  
-Whether to connect to RTCP Staging or Production
+- **`production`** _`(Boolean) - optional, default: false`_  
+  Whether to connect to RTCP Staging or Production
 
-* **`enableLogging`** *`(Boolean) - optional, default: true`*  
-If true, log actions to console.log.
+- **`enableLogging`** _`(Boolean) - optional, default: true`_  
+  If true, log actions to console.log.
 
-* **`clearOnStart`** *`(Boolean) - optional, default: false`*  
-Remove all notifications from the OS's notification center when the app is opened.
+- **`clearOnStart`** _`(Boolean) - optional, default: false`_  
+  Remove all notifications from the OS's notification center when the app is opened.
 
-* **`clearAfter`** *`(Number) - optional, default: 2000`*  
-Time in milliseconds after which to run `clearOnStart` if enabled.
+- **`clearAfter`** _`(Number) - optional, default: 2000`_  
+  Time in milliseconds after which to run `clearOnStart` if enabled.
 
-* **`channelName`** *`(String) - optional, default: "Push Notifications" - Android only`*  
-Currently, RTCP only supports one single notification channel for Android. You can define the name of that notification channel as is appears in Androids Notification Settings for your app
+- **`channelName`** _`(String) - optional, default: "Push Notifications" - Android only`_  
+  Currently, RTCP only supports one single notification channel for Android. You can define the name of that notification channel as is appears in Androids Notification Settings for your app
 
-* **`openURL`** *`(Boolean) - optional, default: true`*  
-Open URLs attached to the notification when the user opened the app by tapping the notification (uses `Linking.openURL()`).
+- **`openURL`** _`(Boolean) - optional, default: true`_  
+  Open URLs attached to the notification when the user opened the app by tapping the notification (uses `Linking.openURL()`).
 
-* **`deepLinking`** *`(Boolean) - optional, default: true`*  
-Handle Deep Links when a user taps a notification with a Deep Link attached (i.e. emit `'url'` event).
+- **`deepLinking`** _`(Boolean) - optional, default: true`_  
+  Handle Deep Links when a user taps a notification with a Deep Link attached (i.e. emit `'url'` event).
 
-* **`autoRegister`** *`(Boolean) - optional, default: true`*  
-Automatically register with backend when push token has been received.
+- **`autoRegister`** _`(Boolean) - optional, default: true`_  
+  Automatically register with backend when push token has been received.
 
-* **`requestPermissions`** *`(Boolean) - optional, default: true`*  
-Request for notification permissions on initialization. If set to `false` you'll have to call `requestNotificationPermissions()` manually.
-
+- **`requestPermissions`** _`(Boolean) - optional, default: true`_  
+  Request for notification permissions on initialization. If set to `false` you'll have to call `requestNotificationPermissions()` manually.
 
 ### Methods
 
@@ -628,10 +648,9 @@ Initializes the rtcp-react-native module with the provided `options`.
 Besides general module configuration, this sets up your app to receive push notifications and registers your device with RTCP.  
 This method needs to be called before you register your root component with `AppRegistry.registerComponent('Appname', () => App);`!
 
-*Parameters*  
+_Parameters_
 
-- `options` *`(Object)`* - (hash) object containing module configuration (see *Configuration*)<br /><br />
-
+- `options` _`(Object)`_ - (hash) object containing module configuration (see _Configuration_)<br /><br />
 
 ```js
 async function sendReadReceipt(push_ids)
@@ -640,21 +659,19 @@ async function sendReadReceipt(push_ids)
 Sets the status of `push_ids` to "read" on the RTCP server.  
 Throws an error if the request failed.
 
-*Parameters*  
+_Parameters_
 
-- `push_ids` *`(String / Array(String))`* - one or more push_ids<br /><br />
-
+- `push_ids` _`(String / Array(String))`_ - one or more push_ids<br /><br />
 
 ```js
 async function deleteNotification(push_id)
 ```
 
-Remove push notification `push_id` from the inbox on the RTCP server.  
+Remove push notification `push_id` from the inbox on the RTCP server.
 
-*Parameters*  
+_Parameters_
 
-- `push_id` *`(String)`* - push_id to delete on server<br /><br />
-
+- `push_id` _`(String)`_ - push_id to delete on server<br /><br />
 
 ```js
 async function getRecentNotifications(count = 10)
@@ -663,14 +680,13 @@ async function getRecentNotifications(count = 10)
 Get the `count` most recent notifications from the RTCP server.  
 Throws an error if the request failed.
 
-*Parameters*  
+_Parameters_
 
-- `count` *(Number)* - number of notifications to fetch
+- `count` _(Number)_ - number of notifications to fetch
 
-*Return Value*  
+_Return Value_
 
 - Array of notifications (see RTCP docs for details)<br /><br />
-
 
 ```js
 function registerEventHandler(event, handler)
@@ -678,11 +694,10 @@ function registerEventHandler(event, handler)
 
 Register a `handler` function to be called when `event` is emitted. For a list of possible events see below.
 
-*Parameters*
+_Parameters_
 
-- `event` *`(String)`* - event to be registered for
-- `handler` *`(Function)`* - function to be called<br /><br />
-
+- `event` _`(String)`_ - event to be registered for
+- `handler` _`(Function)`_ - function to be called<br /><br />
 
 ```js
 function unregisterEventHandler(event, handler)
@@ -690,10 +705,10 @@ function unregisterEventHandler(event, handler)
 
 Removes a `handler` function from the `event` list.
 
-*Parameters*
+_Parameters_
 
-- `event` *`(String)`* - event for which to be removed
-- `handler` *`(Function)`* - function to be removed<br /><br />
+- `event` _`(String)`_ - event for which to be removed
+- `handler` _`(Function)`_ - function to be removed<br /><br />
 
 ### Events
 
@@ -701,23 +716,26 @@ Removes a `handler` function from the `event` list.
   Emitted when the app has successfully been registered with the RTCP server.
 
 - **`"onRemoteNotification": (notification)`**  
-  Emitted when a push notification is received from the RTCP server.  
+  Emitted when a push notification is received from the RTCP server.
 
-  *Function parameters*  
-  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+  _Function parameters_
+
+  - `notification` _(Object)_ - the received push notification as described in _zo0r/react-native-push-notification_
 
 - **`"onNotificationTapped": (notification)`**  
-  Emitted when the app is opened by the user having tapped a notification in the OS's notification center.  
+  Emitted when the app is opened by the user having tapped a notification in the OS's notification center.
 
-  *Function parameters*  
-  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+  _Function parameters_
+
+  - `notification` _(Object)_ - the received push notification as described in _zo0r/react-native-push-notification_
 
 - **`"onChangeAppID": (newAppID, oldAppID)`**  
-  Emitted when the the appID has changed through `registerDevice`  
+  Emitted when the the appID has changed through `registerDevice`
 
-  *Function parameters*  
-  - `newAppID` *(String)* - the new appID the SDK has been set to
-  - `oldAppID` *(String)* - the appID the SDK had used before
+  _Function parameters_
+
+  - `newAppID` _(String)_ - the new appID the SDK has been set to
+  - `oldAppID` _(String)_ - the appID the SDK had used before
 
 ```js
 async function requestNotificationPermissions(rationale = undefined)
@@ -725,10 +743,9 @@ async function requestNotificationPermissions(rationale = undefined)
 
 Request user permission to receive notifications (iOS and Android API level >= 33 (Android 13)). If `requestPermissions` is true (default) this will be called automatically on initialization.
 
-*Parameters*
+_Parameters_
 
-- `rationale` *`(Object)`* - Rationale to be shown no Android as defined in [React Native Docs](https://reactnative.dev/docs/permissionsandroid#request)
-
+- `rationale` _`(Object)`_ - Rationale to be shown no Android as defined in [React Native Docs](https://reactnative.dev/docs/permissionsandroid#request)
 
 ### Advanced Methods
 
@@ -746,10 +763,10 @@ To switch to another RTCP appID within a ReactNative application, call this meth
 The SDK will then switch to that appID globally. If the appID provided is different from the global appID before,
 the event `onChangeAppID` will be emitted.
 
-*Parameters*
+_Parameters_
 
-- `app_id` *`(String)`* - the 16 characters hash string of the RTCP application to switch to. If not provided, the
-                          current global appID will be used.
+- `app_id` _`(String)`_ - the 16 characters hash string of the RTCP application to switch to. If not provided, the
+  current global appID will be used.
 
 ```js
 function unregisterDevice(app_id = undefined)
@@ -757,22 +774,22 @@ function unregisterDevice(app_id = undefined)
 
 Unregisters a device from the backend. Use this method in multi-appID apps to unregister the device from a RTCP application.
 
-*Parameters*
+_Parameters_
 
-- `app_id` *`(String)`* - the 16 characters hash string of the RTCP application to unregister this device for.
-                          If not provided, the current global appID will be used.
+- `app_id` _`(String)`_ - the 16 characters hash string of the RTCP application to unregister this device for.
+  If not provided, the current global appID will be used.
 
 ## Reference - Inbox Module
 
 ### Configuration
 
-- **`enableBadge`** *`(Boolean) - optional, default: true`*  
+- **`enableBadge`** _`(Boolean) - optional, default: true`_  
   Show a badge with the count of unread messages on the app's icon (on Android this does not work with all launch center variants and settings).
 
-- **`inboxSize`** *`(Number) - optional, default: 25`*  
+- **`inboxSize`** _`(Number) - optional, default: 25`_  
   The maximum size of inbox entries. This defines how many entries are stored locally on the phone and fetched from the server.
 
-- **`syncOnAppstart`** *`(Boolean) - optional, default: false`*  
+- **`syncOnAppstart`** _`(Boolean) - optional, default: false`_  
   If `true` the inbox gets synced from the server when the app is opened. Usually, this is not required, since push notifications are added to the local inbox as they come in.  
   Note that in order to reduce server load, the inbox is only synced if the last sync was longer than 10 seconds ago.
 
@@ -784,20 +801,20 @@ async function init(options)
 
 Initializes the inbox module with the provided `options`. Must be called after main module initialization has finished.
 
-*Parameters*  
+_Parameters_
 
-- `options` *`(Object)`* - (hash) object containing module configuration (see *Configuration*)<br /><br />
+- `options` _`(Object)`_ - (hash) object containing module configuration (see _Configuration_)<br /><br />
 
 ```js
 async function syncInbox(force = false)
 ```
 
-Loads the inbox from the RTCP server. To reduce server load (e.g. on repeated app activations), by default this is only executed if 10 seconds have passed since the last sync. Set `force` to `true` e.g. when using this method for *Pull-to-Refresh* user interactions.  
+Loads the inbox from the RTCP server. To reduce server load (e.g. on repeated app activations), by default this is only executed if 10 seconds have passed since the last sync. Set `force` to `true` e.g. when using this method for _Pull-to-Refresh_ user interactions.  
 Throws an error if the request failed.
 
-*Parameters*  
+_Parameters_
 
-- `force` *`(Boolean)`* - run even if last sync was less than 10 seconds ago<br /><br />
+- `force` _`(Boolean)`_ - run even if last sync was less than 10 seconds ago<br /><br />
 
 ```js
 function getInbox()
@@ -805,7 +822,7 @@ function getInbox()
 
 Returns the inbox as an array of notifications.
 
-*Return Value*
+_Return Value_
 
 - Array of notifications<br /><br />
 
@@ -815,7 +832,7 @@ function getUnreadCount()
 
 Returns the number of unread notifications
 
-*Return Value*
+_Return Value_
 
 - Number<br /><br />
 
@@ -826,9 +843,9 @@ function setRead(index)
 Sets the notification at `index` to be read (`read = true`) and sends this state update to the RTCP server.  
 To reduce server requests and load, these updates are queued up and send either 5 seconds after the last update has been made or when the app goes inactive.
 
-*Parameters*
+_Parameters_
 
-- `index` *`(Number)`* - inbox array index of notification to update<br /><br />
+- `index` _`(Number)`_ - inbox array index of notification to update<br /><br />
 
 ```js
 function delete(index)
@@ -836,9 +853,9 @@ function delete(index)
 
 Remove the notification at `index` from the local inbox storage and send a request to also delete from the server's inbox.
 
-*Parameters*
+_Parameters_
 
-- `index` *`(Number)`* - inbox array index of notification to delete<br /><br />
+- `index` _`(Number)`_ - inbox array index of notification to delete<br /><br />
 
 ```js
 function registerEventHandler(event, handler)
@@ -846,11 +863,10 @@ function registerEventHandler(event, handler)
 
 Register a `handler` function to be called when `event` is emitted. For a list of possible events see below.
 
-*Parameters*
+_Parameters_
 
-- `event` *`(String)`* - event to be registered for
-- `handler` *`(Function)`* - function to be called<br /><br />
-
+- `event` _`(String)`_ - event to be registered for
+- `handler` _`(Function)`_ - function to be called<br /><br />
 
 ```js
 function unregisterEventHandler(event, handler)
@@ -858,17 +874,17 @@ function unregisterEventHandler(event, handler)
 
 Removes a `handler` function from the `event` list.
 
-*Parameters*
+_Parameters_
 
-- `event` *`(String)`* - event for which to be removed
-- `handler` *`(Function)`* - function to be removed<br /><br />
+- `event` _`(String)`_ - event for which to be removed
+- `handler` _`(Function)`_ - function to be removed<br /><br />
 
 ### Events
 
 - **`"onInboxUpdate": (inbox)`**  
   Emitted when the inbox has been changed  
-  *Function parameters*  
-  - `inbox` *`(Array)`* - inbox (array of notifications)
+  _Function parameters_
+  - `inbox` _`(Array)`_ - inbox (array of notifications)
 
 ## Reference - Inbox Components
 
@@ -878,33 +894,33 @@ Note: props for `RTCPNotification` and `RTCPNotificationBack` can also be provid
 
 In addition to everything from `SwipeListview` and `Flatlist`, the following props are available:
 
-- **`onSyncError`** *`(function), default: Alert.alert("Error getting notifications from server. Please try again later.")`*  
+- **`onSyncError`** _`(function), default: Alert.alert("Error getting notifications from server. Please try again later.")`_  
   Function that is called when syncing the Inbox with the server on pull-to-refresh failed.
 
-- **`disableDelete`** *`(Boolean), default: undefined (false)`*  
+- **`disableDelete`** _`(Boolean), default: undefined (false)`_  
   If set to true, swiping will be disabled by not providing a `renderHiddenItem` to `SwipeListView`
 
-- **`refreshControlProps`** *`(Object), default: undefined`*  
+- **`refreshControlProps`** _`(Object), default: undefined`_  
   Props to be forwarded to the `RefreshControl` component
 
 ### RTCPNotification
 
-- **`headerText`** *`(function(item)), default: new Date(this.props.item.time).toLocaleString()`*  
+- **`headerText`** _`(function(item)), default: new Date(this.props.item.time).toLocaleString()`_  
   Function returning a string to be put as header of a notification. The current rendered `item` is provided as parameter.
 
-- **`onLinkOpen`** *`(function(url)), default: (url) => { Linking.openURL(url) }`*  
+- **`onLinkOpen`** _`(function(url)), default: (url) => { Linking.openURL(url) }`_  
   By default `Linking.openURL` is called when the user opens a link. If set the provided function will be called instead, allowing to e.g. open the link in an in-app-browser.
 
-- **`styles`** *`(Object)`*  
+- **`styles`** _`(Object)`_  
   Allows to provide styles that are applied to the items within `RTCPNotification`. See [`styles.js`](styles.js) for available and default styles.
 
-- **`renderFsImage`** *`(function(item, closeFunc))`*  
+- **`renderFsImage`** _`(function(item, closeFunc))`_  
   Function returning a component to render the fullscreen image. The provided component is rendered within a `Modal` and shown when the user taps an image.
   The current `item` as well as a `closeFunc` to close the Modal e.g. on tapping a back button are provided as parameters.
 
 ### RTCPNotificationBack
 
-- **`renderDeleteItem`** *`(Component), default: <Text style={[defaultStyles.deleteText, this.props.styles?.deleteText]}>Delete</Text>`*  
+- **`renderDeleteItem`** _`(Component), default: <Text style={[defaultStyles.deleteText, this.props.styles?.deleteText]}>Delete</Text>`_  
   Component to render as delete item within `RTCPNotificationBack`.
 
 ## Reference - Ads Components
@@ -913,37 +929,36 @@ In addition to everything from `SwipeListview` and `Flatlist`, the following pro
 
 This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) to cache images and reduce server load.
 
-- **`zoneId`** *`(Number) - mandatory`*  
+- **`zoneId`** _`(Number) - mandatory`_  
   ID of the adserver zone to load images for
 
-- **`styles`** *`(Object)`*  
+- **`styles`** _`(Object)`_  
   Allows to provide styles that are applied to the items within `RTCPAdImage`. See `adDefaultStyles` in [`styles.js`](styles.js) for available and default styles.
 
-- **`touchableProps`** *`(Object), default: undefined`*  
+- **`touchableProps`** _`(Object), default: undefined`_  
   Props to forward to the `TouchableOpacity` component wrapped around the image.
 
-- **`imageProps`** *`(Object), default: undefined`*  
+- **`imageProps`** _`(Object), default: undefined`_  
   Props to forward to the `FastImage` component.
 
 ### RTCPAdsCarousel
 
 This component is based on a `FlatList` with `RTCPAdImage`s as horizontal items.
 
-- **`zoneId`** *`(Number) - mandatory`*  
+- **`zoneId`** _`(Number) - mandatory`_  
   ID of the adserver zone to load images for
 
-- **`styles`** *`(Object)`*  
+- **`styles`** _`(Object)`_  
   Allows to provide styles that are applied to the items within `RTCPAdsCarousel`. See `adDefaultStyles` in [`styles.js`](styles.js) for available and default styles.
 
-- **`onLoad`** *`(function(adsJson)), default: undefined`*  
+- **`onLoad`** _`(function(adsJson)), default: undefined`_  
   Function that is called after the ad information has been retrieved from the server, with `adsJson` containing the JSON response.
 
-- **`hideIndicatorDots`** *`(Boolean), default: undefined (false)`*  
+- **`hideIndicatorDots`** _`(Boolean), default: undefined (false)`_  
   Defines whether or not to render indicator dots below the images.
 
-- **`itemProps`** *`(Object), default: undefined`*  
+- **`itemProps`** _`(Object), default: undefined`_  
   Props to forward to each image component.
-
 
 ## Troubleshooting
 
@@ -957,8 +972,8 @@ Modify file `node_modules/react-native/Libraries/PermissionsAndroid/NativePermis
 
 ```js
 export type PermissionType =
-  | 'android.permission.POST_NOTIFICATIONS'  // <- add this line
-  | 'android.permission.READ_CALENDAR'
+  | "android.permission.POST_NOTIFICATIONS" // <- add this line
+  | "android.permission.READ_CALENDAR";
 ```
 
 and file `node_modules/react-native/Libraries/PermissionsAndroid/PermissionsAndroid.js`:
