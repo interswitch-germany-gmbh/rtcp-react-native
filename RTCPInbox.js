@@ -117,6 +117,14 @@ class RTCPInbox extends RTCPEvents {
         }
     }
 
+    deleteAll() {
+        if (this._inbox.length > 0) {
+            RTCP.deleteAllNotifications();
+            this._inbox = [];
+            this._emitEvent("onInboxUpdate", this._inbox);
+        }
+    }
+
     // --- private methods ---
 
     async _onRemoteNotification(notification) {
