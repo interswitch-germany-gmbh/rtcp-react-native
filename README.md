@@ -657,6 +657,13 @@ Remove push notification `push_id` from the inbox on the RTCP server.
 
 
 ```js
+async function deleteAllNotifications()
+```
+
+Remove all push notifications from the inbox on the RTCP server.  
+
+
+```js
 async function getRecentNotifications(count = 10)
 ```
 
@@ -839,6 +846,12 @@ Remove the notification at `index` from the local inbox storage and send a reque
 *Parameters*
 
 - `index` *`(Number)`* - inbox array index of notification to delete<br /><br />
+
+```js
+function deleteAll()
+```
+
+Remove all notifications from the local inbox storage and send a request to also delete all notifications from the server's inbox.
 
 ```js
 function registerEventHandler(event, handler)
