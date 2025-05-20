@@ -6,7 +6,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
   - [Android Setup](#android-setup)
-  - [iOS Setup](#ios-setup)
+  - [iOS Setup](#ios-setup) ([Objective-C](#objective-c-most-common), [Swift](#swift---if-you-migrated-your-appdelegate-to-swift))
 - [Usage](#usage)
   - [Deep Linking](#deep-linking)
   - [Inbox Module](#inbox-module)
@@ -162,8 +162,8 @@ This module uses the [@react-native-community/push-notification-ios](https://git
   - *Background Modes*, then tick *Remote notifications*
   - *Push Notifications*
 - Augment your Appdelegate  
-  
-  Objective-C (most common):
+
+#### Objective-C (most common):  
   - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
 
     ```obj-c
@@ -232,12 +232,12 @@ This module uses the [@react-native-community/push-notification-ios](https://git
     // @end
     ```
 
-  Swift - if you migrated your AppDelegate to Swift:
+#### Swift - if you migrated your AppDelegate to Swift:
   - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.swift`
 
     ```swift
     // --> add this to the top of the file
-    @import RTCP
+    import RTCP
     ```
 
     ```swift
