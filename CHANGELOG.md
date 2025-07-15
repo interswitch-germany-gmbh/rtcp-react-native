@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1 / 2025-07-15
+
+* Implement new delete_all API endpoint
+* minor README updates
+
 ## 2.2.0 / 2023-07-19
 
 * Add support for Android 13 / API Level >= 33 (runtime permission for notifications)
