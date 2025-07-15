@@ -151,6 +151,10 @@ class RTCP extends RTCPEvents {
         RTCPApi.deleteNotification(this.hardware_id, push_id);
     }
 
+    async deleteAllNotifications() {
+        RTCPApi.deleteAllNotifications(this.hardware_id);
+    }
+
     async registerDevice(app_id = undefined) {
         let oldAppID = RTCPApi.appID;
         if (app_id) RTCPApi.appID = app_id;  // change appID globally if provided

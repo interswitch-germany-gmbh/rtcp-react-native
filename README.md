@@ -67,10 +67,10 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  yarn add react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
 
   # using npm
-  npm install react-native-device-info react-native-push-notification react-native-default-preference @react-native-community/push-notification-ios
+  npm install react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
   ```
 
 ### Android Setup
@@ -287,7 +287,7 @@ In order to enable extended features like Rich Push and Delivery Status you need
   - For *Product Name* enter: `RTCPNotificationServiceExtension`
   - Ensure `Swift` is selected as *Language*
   - Choose *Finish*. At the following popup dialog do not activate the scheme, click *Cancel* instead
-  - Select the new target `RTCPNotificationServiceExtension` in the *Project and Targets list*, go to *General*. Under *Deployment Info* choose: `iOS 10.0`
+  - Select the new target `RTCPNotificationServiceExtension` in the *Project and Targets list*, go to *General*. Under *Deployment Info* choose at least: `iOS 10.0`
   - In *Project Explorer* open `RTCPNotificationServiceExtension/NotificationService.swift` and replace its entire content with:
 
     ```swift
@@ -657,6 +657,13 @@ Remove push notification `push_id` from the inbox on the RTCP server.
 
 
 ```js
+async function deleteAllNotifications()
+```
+
+Remove all push notifications from the inbox on the RTCP server.  
+
+
+```js
 async function getRecentNotifications(count = 10)
 ```
 
@@ -839,6 +846,12 @@ Remove the notification at `index` from the local inbox storage and send a reque
 *Parameters*
 
 - `index` *`(Number)`* - inbox array index of notification to delete<br /><br />
+
+```js
+function deleteAll()
+```
+
+Remove all notifications from the local inbox storage and send a request to also delete all notifications from the server's inbox.
 
 ```js
 function registerEventHandler(event, handler)

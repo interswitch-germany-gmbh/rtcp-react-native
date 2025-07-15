@@ -124,6 +124,26 @@ class RTCPApi {
         }
     }
 
+    async deleteAllNotifications(hardware_id) {
+        try {
+            this.log('Deleting all notifications from server');
+            const response = await fetch(this.baseUrl + "notifications/delete_all", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "AUTH-APP-ID": this.appID },
+                body: JSON.stringify({
+                    hardware_id: hardware_id,
+                })
+            });
+            if (!response.ok || !(await response.json()).processed) {
+                throw "Received non-ok response from RTCP";
+            }
+            return true;
+        } catch (error) {
+            this.log("Error deleting notification from server:", error);
+            return false;
+        }
+    }
+
     _statustextToJSONPayload(adData) {
         try {
             adData.payload = JSON.parse(adData.statustext);
