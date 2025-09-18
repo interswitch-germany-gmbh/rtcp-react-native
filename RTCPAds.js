@@ -101,7 +101,7 @@ export class RTCPAdsCarousel extends Component {
 }
 
 export class RTCPAdImageBase extends Component {
-    async openUrl(url) {
+    openUrl(url) {
         try {
             Linking.canOpenURL(url).then(
               async can => {
