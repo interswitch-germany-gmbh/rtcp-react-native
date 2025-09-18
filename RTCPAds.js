@@ -1,9 +1,10 @@
-import React, { Component } from "react";
-import { View, TouchableOpacity, Dimensions, FlatList, Linking } from "react-native";
+import { Component } from "react";
+import { Dimensions, FlatList, Linking, TouchableOpacity, View } from "react-native";
 import FastImage from 'react-native-fast-image';
 import RTCPApi from "rtcp-react-native/RTCPApi";
+import RTCP from "./RTCP";
 
-import { adDefaultStyles } from "./styles"
+import { adDefaultStyles } from "./styles";
 
 export class RTCPAdImage extends Component {
     constructor(props) {
@@ -102,8 +103,16 @@ export class RTCPAdsCarousel extends Component {
 export class RTCPAdImageBase extends Component {
     async openUrl(url) {
         try {
-            await Linking.openURL(url);
-        } catch (error) {}
+            Linking.canOpenURL(url).then(
+              async can => {
+                if (can) {
+                  await Linking.openURL(url)
+                }
+              }
+            )
+        } catch (error) {
+          RTCP.log('AdImage openUrl error: ' + error.message)
+        }
     };
 
     render() {
@@ -111,15 +120,7 @@ export class RTCPAdImageBase extends Component {
         const { source, ...props } = this.props
         return (
             <TouchableOpacity
-                onPress={
-                  () => {
-                    if (props.adJson?.url) {
-                      Linking.canOpenURL(props.adJson?.url).then(
-                        () => Linking.openURL(props.adJson?.url).catch()
-                      ).catch()
-                    }
-                  }
-                } 
+                onPress={() => this.openUrl(props.adJson?.url || '')}
                 style={[adDefaultStyles.adImageWrapper, this.props.styles?.adImageWrapper]}
                 {...props.touchableProps}>
                 <FastImage
