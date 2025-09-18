@@ -111,7 +111,15 @@ export class RTCPAdImageBase extends Component {
         const { source, ...props } = this.props
         return (
             <TouchableOpacity
-                onPress={() => Linking.openURL(props.adJson?.url).catch()}
+                onPress={
+                  () => {
+                    if (props.adJson?.url) {
+                      Linking.canOpenURL(props.adJson?.url).then(
+                        () => Linking.openURL(props.adJson?.url).catch()
+                      ).catch()
+                    }
+                  }
+                } 
                 style={[adDefaultStyles.adImageWrapper, this.props.styles?.adImageWrapper]}
                 {...props.touchableProps}>
                 <FastImage

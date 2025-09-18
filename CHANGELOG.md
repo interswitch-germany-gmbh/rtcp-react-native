@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2 / 2025-09-18
+
+* fix crash in AdImage.onPress() when url is empty
+
 ## 2.2.1 / 2025-07-15
 
 * Implement new delete_all API endpoint
