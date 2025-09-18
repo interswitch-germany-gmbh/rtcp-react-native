@@ -101,18 +101,17 @@ export class RTCPAdsCarousel extends Component {
 }
 
 export class RTCPAdImageBase extends Component {
-    openUrl(url) {
-        try {
-            Linking.canOpenURL(url).then(
-              async can => {
-                if (can) {
-                  await Linking.openURL(url)
-                }
-              }
-            )
-        } catch (error) {
-          RTCP.log('AdImage openUrl error: ' + error.message)
-        }
+    async openUrl(url) {
+      try {
+          const can = await Linking.canOpenURL(url);
+          if (can) {
+              await Linking.openURL(url);
+          } else {
+              RTCP.log(`AdImage openUrl error: Cannot open URL ${url}`);
+          }
+      } catch (error) {
+          RTCP.log('AdImage openUrl error: ' + error.message);
+      }
     };
 
     render() {
