@@ -1,22 +1,38 @@
 {
   "name": "rtcp-react-native",
-  "version": "2.2.2",
+  "version": "3.0.0-beta.1",
   "description": "React Native module for integration with RTCP",
-  "main": "RTCP.js",
+  "main": "dist/RTCP.js",
+  "types": "dist/RTCP.d.ts",
+  "files": ["dist"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "author": "Hubert Nusser <hubert.nusser@interswitchgroup.com>",
   "homepage": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
   "repository": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">= 0.60",
-    "react-native-default-preference": "^1.4.3",
-    "react-native-device-info": ">= 6.0.0",
-    "react-native-push-notification": ">= 7.0.0"
+    "react-native": ">= 0.80",
+    "react-native-default-preference": ">= 1.4.4",
+    "react-native-device-info": ">= 12",
+    "@react-native-firebase/app": ">= 10.0.0",
+    "@react-native-firebase/messaging": ">= 10.0.0"
   },
   "dependencies": {
-    "react-native-swipe-list-view": ">= 3.2"
+    "@notifee/react-native": ">= 9.1.8"
+  },
+  "devDependencies": {
+    "@firebase/app": "^0.14.8",
+    "@react-native-firebase/app": "^23.8.6",
+    "@react-native-firebase/messaging": "^23.8.6",
+    "@types/react": "^19",
+    "@types/react-native": "^0.73.0",
+    "react": "^19.2.4",
+    "react-native": "^0.84.0",
+    "react-native-default-preference": "^1.4.4",
+    "react-native-device-info": "^15.0.2",
+    "typescript": "^5.9.3"
   }
 }

@@ -1,20 +1,34 @@
+interface RTCPDevice {
+    hardware_id: string;
+    push_token?: string;
+    platform_type?: "IosPlatform" | "AndroidPlatform";
+    device_type?: string;
+    api_version?: string;
+    sdk_version?: string;
+    tags?: {
+        app_version?: string;
+        [key: string]: any;
+    };
+    [key: string]: any;
+}
+
 class RTCPApi {
-    logPrefix = "[RTCP Api]";
+    logPrefix: string = "[RTCP Api]";
 
     // constants
-    RTCP_BASE_URL_TEST = "https://rtcp-staging.vanso.com/api/";
-    RTCP_BASE_URL_PROD = "https://rtcp.vanso.com/api/";
+    readonly RTCP_BASE_URL_TEST: string = "https://rtcp-staging.vanso.com/api/";
+    readonly RTCP_BASE_URL_PROD: string = "https://rtcp.vanso.com/api/";
 
     // add possibility to easily override console.log
-    log() {
-        console.log(...arguments);
+    log(...args: any[]): void {
+        console.log(...args);
     }
 
-    baseUrl = this.RTCP_BASE_URL_TEST;
-    appID = "";
+    baseUrl: string = this.RTCP_BASE_URL_TEST;
+    appID: string = "";
 
     // register device with RTCP (devices/register_device)
-    async registerDevice(device, app_id = this.appID) {
+    async registerDevice(device: RTCPDevice, app_id: string = this.appID): Promise<boolean> {
         try {
             this.log("Registering with RTCP Server, app_id:", app_id, "hardware_id:", device.hardware_id);
             const response = await fetch(this.baseUrl + "devices/register_device", {
@@ -23,7 +37,7 @@ class RTCPApi {
                 body: JSON.stringify({ device: device })
             });
             if (!response.ok || !(await response.json()).processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
 
             this.log("Successfully registered with RTCP Server");
@@ -35,7 +49,7 @@ class RTCPApi {
     }
 
     // unregister device from RTCP (devices/unregister_device)
-    async unregisterDevice(device, app_id = this.appID) {
+    async unregisterDevice(device: RTCPDevice, app_id: string = this.appID): Promise<boolean> {
         try {
             this.log("Unregistering device from RTCP Server, app_id:", app_id, "hardware_id:", device.hardware_id);
             const response = await fetch(this.baseUrl + "devices/unregister_device", {
@@ -44,7 +58,7 @@ class RTCPApi {
                 body: JSON.stringify({ device: device })
             });
             if (!response.ok || !(await response.json()).processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
 
             this.log("Successfully unregistered device from RTCP Server");
@@ -56,8 +70,8 @@ class RTCPApi {
     }
 
     // update remote status of notification (read_receipt/{received,tapped,read})
-    async updateNotificationRemoteStatus(hardware_id, push_ids, status, app_id = this.appID) {
-        if (!(["received", "read", "tapped"].includes(status))) return;
+    async updateNotificationRemoteStatus(hardware_id: string, push_ids: string | string[], status: "received" | "read" | "tapped", app_id: string = this.appID): Promise<boolean> {
+        if (!(["received", "read", "tapped"].includes(status))) return false;
 
         try {
             this.log('Updating remote status for notification with ID "' + push_ids + '" to', status);
@@ -71,7 +85,7 @@ class RTCPApi {
                 })
             });
             if (!response.ok || !(await response.json()).processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return true;
         } catch (error) {
@@ -81,7 +95,7 @@ class RTCPApi {
     }
 
     // get the most recent notifications from server
-    async getRecentNotifications(hardware_id, count) {
+    async getRecentNotifications(hardware_id: string, count: number): Promise<any[]> {
         try {
             this.log("Getting recent notifications from RTCP Server");
             const response = await fetch(this.baseUrl + "notifications/recent", {
@@ -94,16 +108,16 @@ class RTCPApi {
             });
             let res = await response.json();
             if (!response.ok || !res.processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return res.notifications || [];
         } catch (error) {
             this.log("Error getting recent notifications:", error);
-            throw "Error getting recent notifications:";
+            throw new Error("Error getting recent notifications:");
         }
     }
 
-    async deleteNotification(hardware_id, push_id) {
+    async deleteNotification(hardware_id: string, push_id: string): Promise<boolean> {
         try {
             this.log('Deleting notification from server with ID ' + push_id);
             const response = await fetch(this.baseUrl + "notifications/delete", {
@@ -115,7 +129,7 @@ class RTCPApi {
                 })
             });
             if (!response.ok || !(await response.json()).processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return true;
         } catch (error) {
@@ -124,7 +138,7 @@ class RTCPApi {
         }
     }
 
-    async deleteAllNotifications(hardware_id) {
+    async deleteAllNotifications(hardware_id: string): Promise<boolean> {
         try {
             this.log('Deleting all notifications from server');
             const response = await fetch(this.baseUrl + "notifications/delete_all", {
@@ -135,7 +149,7 @@ class RTCPApi {
                 })
             });
             if (!response.ok || !(await response.json()).processed) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return true;
         } catch (error) {
@@ -144,7 +158,7 @@ class RTCPApi {
         }
     }
 
-    _statustextToJSONPayload(adData) {
+    _statustextToJSONPayload(adData: any): any {
         try {
             adData.payload = JSON.parse(adData.statustext);
         } catch (e) {
@@ -153,14 +167,14 @@ class RTCPApi {
         return adData;
     }
 
-    async getAdForZone(zone_id) {
+    async getAdForZone(zone_id: number): Promise<{}> {
         if (!zone_id) return {};
         try {
             this.log('Getting Ad image data from server for zone ' + zone_id);
             const response = await fetch(this.baseUrl + "ads/ajson.php?zoneid=" + zone_id);
             let res = await response.json();
             if (!response.ok) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return this._statustextToJSONPayload(res || {});
         } catch (error) {
@@ -169,14 +183,14 @@ class RTCPApi {
         }
     }
 
-    async getAllAdsForZone(zone_id) {
+    async getAllAdsForZone(zone_id: number): Promise<any[]> {
         if (!zone_id) return [];
         try {
             this.log('Getting Ad images data from server for zone ' + zone_id);
             const response = await fetch(this.baseUrl + "ads/ajson_all.php?zoneid=" + zone_id);
             let res = await response.json();
             if (!response.ok) {
-                throw "Received non-ok response from RTCP";
+                throw new Error("Received non-ok response from RTCP");
             }
             return Array.isArray(res) ? res.map((ad) => this._statustextToJSONPayload(ad)) : []
         } catch (error) {
