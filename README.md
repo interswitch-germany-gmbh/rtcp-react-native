@@ -2,48 +2,54 @@
 
 © Interswitch Germany GmbH
 
-- [About](#about)
-- [Requirements](#requirements)
-- [Installation](#installation)
-  - [Android Setup](#android-setup)
-  - [iOS Setup](#ios-setup) ([Objective-C](#objective-c-most-common), [Swift](#swift---if-you-migrated-your-appdelegate-to-swift))
-- [Usage](#usage)
-  - [Deep Linking](#deep-linking)
-  - [Inbox Module](#inbox-module)
-  - [Inbox List Component](#inbox-list-component)
-    - [Customization](#customization)
-  - [Ads Components](#ads-components)
-- [Reference - Core Module](#reference---core-module)
-  - [Configuration](#configuration)
-  - [Methods](#methods)
-  - [Events](#events)
-  - [Advanced Methods](#advanced-methods)
-- [Reference - Inbox Module](#reference---inbox-module)
-  - [Configuration](#configuration-1)
-  - [Methods](#methods-1)
-  - [Events](#events-1)
-- [Reference - Inbox Components](#reference---inbox-components)
-  - [RTCPInboxList](#rtcpinboxlist)
-  - [RTCPNotification](#rtcpnotification)
-  - [RTCPNotificationBack](#rtcpnotificationback)
-- [Reference - Ads Components](#reference---ads-components)
-  - [RTCPAdImage](#rtcpadimage)
-  - [RTCPAdsCarousel](#rtcpadscarousel)
-- [Troubleshooting](#troubleshooting)
-  - [Runtime permission introduced in Android 13](#runtime-permission-introduced-in-android-13)
+- [rtcp-react-native](#rtcp-react-native)
+  - [About](#about)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [Android Setup](#android-setup)
+    - [iOS Setup](#ios-setup)
+      - [Objective-C (most common):](#objective-c-most-common)
+      - [Swift - if you migrated your AppDelegate to Swift:](#swift---if-you-migrated-your-appdelegate-to-swift)
+  - [Usage](#usage)
+    - [Deep Linking](#deep-linking)
+    - [Inbox Module](#inbox-module)
+    - [Inbox List Component](#inbox-list-component)
+      - [Customization](#customization)
+    - [Ads Components](#ads-components)
+  - [Reference - Core Module](#reference---core-module)
+    - [Configuration](#configuration)
+    - [Methods](#methods)
+    - [Events](#events)
+    - [Advanced Methods](#advanced-methods)
+  - [Reference - Inbox Module](#reference---inbox-module)
+    - [Configuration](#configuration-1)
+    - [Methods](#methods-1)
+    - [Events](#events-1)
+  - [Reference - Inbox Components](#reference---inbox-components)
+    - [RTCPInboxList](#rtcpinboxlist)
+    - [RTCPNotification](#rtcpnotification)
+    - [RTCPNotificationBack](#rtcpnotificationback)
+  - [Reference - Ads Components](#reference---ads-components)
+    - [RTCPAdImage](#rtcpadimage)
+    - [RTCPAdsCarousel](#rtcpadscarousel)
+  - [Troubleshooting](#troubleshooting)
+    - [Runtime permission introduced in Android 13](#runtime-permission-introduced-in-android-13)
 
 ## About
 
-This is a React Native module for integrating Push Notifications with Interswitch's [RTCP Platform](https://rtcp.vanso.com)
+This is a React Native module for integrating Push Notifications with Interswitch's [RTCP Platform](https://rtcp.vanso.com).
+
+[!IMPORTANT]
+This documentation is for version 3.x and later of the module. If you are using version 2.x, please refer to the [v2 documentation](https://github.com/interswitch-germany-gmbh/rtcp-react-native/blob/v2.0.0/README.md).
 
 ## Requirements
 
-- React-Native >= 0.60
+- React-Native >= 0.80
+- Android:
+  - Android API Level >= 21
 - iOS:
   - iOS >= 10  
-    Why: with iOS 10 notification handling has been majorly reworked by Apple to e.g. support media attachments
   - Cocoapods
-  - Compilation of Swift code. If your app fails compiling with errors like "Could not find auto-linked library 'swiftFoundation'", add an empty dummy Swift file (see [here](https://stackoverflow.com/a/54586937/12079891) for instructions).
 
 ## Installation
 
@@ -60,22 +66,22 @@ This is a React Native module for integrating Push Notifications with Interswitc
   To install and bind to a specific version add the version tag as hash:
 
   ```sh
-  yarn add github:interswitch-germany-gmbh/rtcp-react-native#2.0.0
+  yarn add github:interswitch-germany-gmbh/rtcp-react-native#3.0.0
   ```
 
 - Add all required peerDependencies, as they're not installed automatically ([why?](https://github.com/react-native-community/cli/issues/914#issuecomment-574759432)):
 
   ```sh
   # using yarn
-  yarn add react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
+  yarn add react-native-default-preference react-native-device-info @react-native-firebase/app @react-native-firebase/messaging
 
   # using npm
-  npm install react-native-device-info react-native-push-notification react-native-default-preference react-native-fast-image @react-native-community/push-notification-ios
+  npm install react-native-default-preference react-native-device-info @react-native-firebase/app @react-native-firebase/messaging
   ```
 
 ### Android Setup
 
-Set up your app for use with Google Firebase Cloud Messaging. See the [official documentation](https://firebase.google.com/docs/cloud-messaging/android/client) on how to do this. Here's a short summary:
+Set up your app for use with Google Firebase Cloud Messaging. See the official documentation ([here](https://firebase.google.com/docs/cloud-messaging/android/client) and [here](https://rnfirebase.io/)) on how to do this. Here's a short summary:
 
 - If not done for your app already, sign in to [Firebase Console](console.firebase.google.com), create a Firebase project and register your app.
 - Download the `google-services.json` file and put it into the folder `/android/app/` of your React Native app.
@@ -90,7 +96,7 @@ Set up your app for use with Google Firebase Cloud Messaging. See the [official 
         dependencies {
             ...
             // Add the following line:
-            classpath 'com.google.gms:google-services:4.3.4'  // Google Services plugin
+            classpath 'com.google.gms:google-services:4.4.4'  // Google Services plugin
     ```
 
   - Apply the Google Services Gradle plugin and declare the dependency for the Firebase Cloud Messaging Android library
@@ -101,40 +107,12 @@ Set up your app for use with Google Firebase Cloud Messaging. See the [official 
     ...
     // Add the following line:
     apply plugin: 'com.google.gms.google-services'  // Google Services plugin
-    ...
-    dependencies {
-        ...
-        // Import the BoM for the Firebase platform
-        implementation platform('com.google.firebase:firebase-bom:26.0.0')
 
-        // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
-        // When using the BoM, you don't specify versions in Firebase library dependencies
-        implementation 'com.google.firebase:firebase-messaging'
-        implementation 'com.google.firebase:firebase-analytics'
     ```
 
-This module uses the [react-native-push-notification](https://github.com/zo0r/react-native-push-notification) module. Here is what's required to set it up. On issues please look for updated instructions on its website.
-
-- Enable the service extension for message handling:
-
-  in `android/app/src/main/AndroidManifest.xml`:
-
-  ```xml
-  <manifest ...
-      <!-- required for API Level >= 33 (Android 13) -->
-      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-      ...
-      <application ...
-      ...
-          <!-- add this section -->
-          <service android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService" android:exported="false" >
-              <intent-filter>
-                  <action android:name="com.google.firebase.MESSAGING_EVENT" />
-              </intent-filter>
-          </service>
-  ```
-
 ### iOS Setup
+
+// TODO: rework
 
 This module uses the [@react-native-community/push-notification-ios](https://github.com/react-native-push-notification-ios/push-notification-ios) module for iOS. Setup slightly differs from their instructions.
 

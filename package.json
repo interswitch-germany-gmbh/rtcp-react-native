@@ -17,8 +17,8 @@
     "react-native": ">= 0.80",
     "react-native-default-preference": ">= 1.4.4",
     "react-native-device-info": ">= 12",
-    "@react-native-firebase/app": ">= 10.0.0",
-    "@react-native-firebase/messaging": ">= 10.0.0"
+    "@react-native-firebase/app": ">= 17",
+    "@react-native-firebase/messaging": ">= 17"
   },
   "dependencies": {
     "@notifee/react-native": ">= 9.1.8"
