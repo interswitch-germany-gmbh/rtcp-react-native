@@ -1,4 +1,4 @@
-import RTCPApi from "./RTCPApi.js";
+import RTCPApi from "./RTCPApi";
 import RTCPEvents from "./RTCPEvents.js";
 
 import { getAPNSToken, getMessaging, onMessage, setBackgroundMessageHandler, getToken, Messaging } from '@react-native-firebase/messaging';
@@ -48,38 +48,46 @@ type RTCPInitOptions = Partial<typeof DEFAULTS> & {
     appID: string;
 }
 
-// Device type mapping for registration
-const DEVICE_TYPE_MAP: Record<string, string> = {
-    Handset: "phone",
-    Tablet: "tablet",
-    Tv: "other",
-    unknown: "other"
-};
-
 class RTCP extends RTCPEvents {
-    logPrefix = "[RTCP]";
 
-    // Supported event names
-    protected readonly _events = ["onRemoteNotification", "onNotificationTapped", "onRegister", "onChangeAppID"] as const;
+    /** Prefix for log messages */
+    readonly logPrefix: string = "[RTCP]";
 
-    hardware_id = "";
+    /** Supported event names */
+    protected readonly _events: readonly string[] = ["onRemoteNotification", "onNotificationTapped", "onRegister", "onChangeAppID"];
+
+    /** Device hardware ID */
+    hardware_id: string = "";
+
+    /** Push token */
     token?: string;
+
+    /** Notification channel ID */
     channelId: string = '';
-    _removeNotificationsTimer?: any;
 
-    private messaging: Messaging = getMessaging();
+    /** Timer for removing notifications */
+    _removeNotificationsTimer?: ReturnType<typeof setTimeout> | null;
 
-    appID() { return RTCPApi.appID; }
+    /** Firebase messaging instance */
+    private readonly messaging: Messaging = getMessaging();
+
+    /** Get current app ID */
+    appID(): string { return RTCPApi.appID; }
 
     // Custom logging - prepend module name in log output
     // TODO: this.logPrefix always refers to RTCP, even in RTCPApi.
-    log(...args: any[]) {
+    log(...args: any[]): void {
         if (this.enableLogging) {
             args.unshift(this.logPrefix || "[rtcp-react-native]");
-            console.log(...args);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            console.log(...(args as any[]));
         }
     }
 
+    /**
+     * Initialize the RTCP SDK
+     * @param options - Configuration options (see README)
+     */
     /**
      * Initialize the RTCP SDK
      * @param options - Configuration options (see README)
@@ -88,7 +96,7 @@ class RTCP extends RTCPEvents {
         // --- Module configuration ---
 
         // appID: string (mandatory)
-        if (!options.appID) throw 'Unable to initialize RTCP! Mandatory parameter "appID" is missing in options!';
+        if (!options.appID) throw new Error('Unable to initialize RTCP! Mandatory parameter "appID" is missing in options!');
         RTCPApi.appID = options.appID;
 
         // set provided options as class properties or use default value
@@ -119,14 +127,14 @@ class RTCP extends RTCPEvents {
                 .catch((err: Error) => { this.log("Failed to get FCM token", err); });
         } else if (Platform.OS === "ios") {
             getAPNSToken(this.messaging)
-                .then((token) => {
+                .then((token: string | null) => {
                     if (!token) throw new Error("APNs token is null");
                     this._onRTCPRegister(token);
                 })
                 .catch((err: Error) => { this.log("Failed to get APNs token", err); });
         }
 
-        notifee.onBackgroundEvent(async ({ type, detail }) => {
+        notifee.onBackgroundEvent(async ({ type, detail }: { type: EventType; detail: EventDetail }) => {
             // PRESS: User tapped notification
             if (type === EventType.PRESS) {
                 await this._onRTCPNotification({ ...detail.notification, userInteraction: true });
@@ -134,7 +142,7 @@ class RTCP extends RTCPEvents {
         });
 
         // create notification channel (required for Android)
-        this._createChannel();
+        await this._createChannel();
 
         // get device id
         // not using 'getUniqueIdSync' for two reasons:
@@ -144,13 +152,13 @@ class RTCP extends RTCPEvents {
 
         // Android 13 introduced showing notifications as 'dangerous' permission that requires 'runtime permission'. Check for RN compatibility.
         if ((Platform.OS === "android" && DeviceInfo.getApiLevelSync() >= 33) && !PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS) {
-            throw 'Unable to initialize RTCP! Using API level >= 33 requires RN >= 0.70.7 for notifications to display.'
-            + ' If you cannot update your RN version currently, check the README for a workaround.'
+            throw new Error('Unable to initialize RTCP! Using API level >= 33 requires RN >= 0.70.7 for notifications to display.'
+            + ' If you cannot update your RN version currently, check the README for a workaround.');
         }
 
         // clear notifications when app becomes active if enabled
         if (this.clearOnStart) {
-            AppState.addEventListener("change", (nextAppState) => {
+            AppState.addEventListener("change", (nextAppState: string) => {
                 if (nextAppState === "active") {
                     this._removeNotificationsTimer = setTimeout(() => {
                         notifee.cancelDisplayedNotifications();
@@ -166,7 +174,7 @@ class RTCP extends RTCPEvents {
         // iOS only: store app and device info in UserDefaults for Notification Service Extension
         if (Platform.OS === "ios") {
             // initialize storage
-            let appgroup = "group." + DeviceInfo.getBundleId() + ".rtcp"; // used for sharing settings with iOS Notification Service Extension
+            const appgroup = "group." + DeviceInfo.getBundleId() + ".rtcp"; // used for sharing settings with iOS Notification Service Extension
             await DefaultPreference.setName(appgroup);
             await DefaultPreference.set("rtcp_base_url", RTCPApi.baseUrl);
             await DefaultPreference.set("rtcp_app_id", RTCPApi.appID);
@@ -225,16 +233,16 @@ class RTCP extends RTCPEvents {
 
         if (this.token) {
             // create device registration data
-            let device = {
+            const device = {
                 hardware_id: this.hardware_id,
                 push_token: this.token,
-                platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform",
-                device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()],
+                platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform" as "IosPlatform" | "AndroidPlatform",
+                device_type: DeviceInfo.getDeviceType(),
                 api_version: "2",
                 sdk_version: SDK_VERSION,
                 tags: { app_version: DeviceInfo.getVersion() }
             };
-            let deviceJson = JSON.stringify(device);
+            const deviceJson = JSON.stringify(device);
 
             // check if registration data has changed. if not, do not register again to reduce server load
             const registeredDevice = await DefaultPreference.get(pref_key);
@@ -267,7 +275,7 @@ class RTCP extends RTCPEvents {
     /**
      * Request notification permissions from the user
      */
-    requestNotificationPermissions = async (rationale?: any): Promise<void> => {
+    requestNotificationPermissions = async (rationale?: unknown): Promise<void> => {
         await notifee.requestPermission();
     }
 
@@ -281,7 +289,7 @@ class RTCP extends RTCPEvents {
         if (this.autoRegister) await this.registerDevice();
     }
 
-    _onRTCPNotification = async (notification: any): Promise<void> => {
+    _onRTCPNotification = async (notification: Record<string, any>): Promise<void> => {
         // TODO: check notification format on iOS
 
         // get hardware_id in case register event occurred before initialization finished
@@ -331,7 +339,7 @@ class RTCP extends RTCPEvents {
         }
     }
 
-    _handleAndroidNotification = async (data: any): Promise<void> => {
+    _handleAndroidNotification = async (data: Record<string, any>): Promise<void> => {
         // we need to run and wait for this, for when the app is awoken from killed, or displayNotification will be called too soon and not work
         await this._createChannel();
 
@@ -363,7 +371,7 @@ class RTCP extends RTCPEvents {
     /**
      * Build a notification ID from push ID (for replace/revoke logic)
      */
-    _buildNotificationID = (pushID: string): string | "" => {
+    _buildNotificationID = (pushID: string): string => {
         if (!pushID) return "";
         if (pushID.startsWith("PW")) {
             return pushID.substring(2) + "2";
@@ -376,7 +384,7 @@ class RTCP extends RTCPEvents {
     /**
      * Convert legacy notification payloads to new format
      */
-    _convertFromOld = (notification: any): any => {
+    _convertFromOld = (notification: Record<string, any>): Record<string, any> => {
         if (notification.title && notification.title === notification.message) {
             notification.title = null;
         }
