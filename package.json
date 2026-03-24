@@ -4,7 +4,22 @@
   "description": "React Native module for integration with RTCP",
   "main": "dist/RTCP.js",
   "types": "dist/RTCP.d.ts",
-  "files": ["dist"],
+  "files": ["RTCP.podspec", "dist", "ios"],
+  "exports": {
+    ".": {
+      "types": "./dist/RTCP.d.ts",
+      "import": "./dist/RTCP.js",
+      "require": "./dist/RTCP.js"
+    },
+    "./RTCPInbox": {
+      "import": "./dist/RTCPInbox.js",
+      "require": "./dist/RTCPInbox.js"
+    },
+    "./RTCPInboxList": {
+      "import": "./dist/RTCPInboxList.js",
+      "require": "./dist/RTCPInboxList.js"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
@@ -21,7 +36,8 @@
     "@react-native-firebase/messaging": ">= 17"
   },
   "dependencies": {
-    "@notifee/react-native": ">= 9.1.8"
+    "@notifee/react-native": ">= 9.1.8",
+    "react-native-swipe-list-view": ">= 3.2"
   },
   "devDependencies": {
     "@firebase/app": "^0.14.8",
