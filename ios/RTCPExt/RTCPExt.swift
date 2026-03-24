@@ -1,5 +1,6 @@
 import UserNotifications
 import UIKit
+import RNNotifeeCore
 
 // Class for Notification Service Extension
 public class RTCPExt {
@@ -25,8 +26,10 @@ public class RTCPExt {
             data["message"] = data["message"] ?? ((data["aps"] as? [String: Any])?["alert"] as? [String: String])?["body"]
             data["title"]   = data["title"]   ?? ((data["aps"] as? [String: Any])?["alert"] as? [String: String])?["title"]
             data["push_id"] = data["push_id"] ?? (data["app_data"] as? [String: Any])?["push_id"] as? String
-            if var app_data = data["app_data"] as? [String: Any] {  // remove push_id from app_data
+            data["url"]     = data["url"]     ?? (data["app_data"] as? [String: Any])?["url"] as? String
+            if var app_data = data["app_data"] as? [String: Any] {  // remove push_id and url from app_data
                 app_data["push_id"] = nil
+                app_data["url"] = nil
                 data["app_data"] = app_data
             }
 
@@ -78,8 +81,21 @@ public class RTCPExt {
                     }
 
                     // add info that push notification has been processed by NSE
-                    bestAttemptContent.userInfo.updateValue("true", forKey: "rtcp_nse_processed")
-                    contentHandler(bestAttemptContent)
+                    bestAttemptContent.userInfo["rtcp_nse_processed"] = "true"
+
+                    // allow use of Notifee's API
+                    if bestAttemptContent.userInfo["notifee_options"] != nil {
+                        // save notification payload into data (otherwise Notifee would strip it)
+                        var userInfo = bestAttemptContent.userInfo
+                        userInfo["notifee_options"] = ["data": data]
+                        bestAttemptContent.userInfo = userInfo
+
+                        NotifeeExtensionHelper.populateNotificationContent(request, with: bestAttemptContent, withContentHandler: contentHandler)
+                    } else {
+                        // store payload in Notifee's internal field, otherwise Notifee will not emit action events
+                        bestAttemptContent.userInfo["__notifee_notification"] = ["data": data]
+                        contentHandler(bestAttemptContent)
+                    }
                 }
 
                 // --- SEND DELIVERY RECEIPT ---

@@ -11,6 +11,13 @@ import { DeviceEventEmitter, PermissionsAndroid } from 'react-native';
 
 import { version as SDK_VERSION } from "./package.json";
 
+const DEVICE_TYPE_MAP: Record<string, string> = {
+    Handset: "phone",
+    Tablet: "tablet",
+    Tv: "other",
+    unknown: "other"
+};
+
 const DEFAULTS = {
     /** Whether to connect to RTCP Staging or Production */
     production: false,
@@ -44,7 +51,7 @@ type RTCPOptions = typeof DEFAULTS;
 interface RTCP extends RTCPOptions {}
 
 type RTCPInitOptions = Partial<typeof DEFAULTS> & {
-    // /** The 16 characters hash string of your application in RTCP (mandatory) */
+    /** The 16 characters hash string of your application in RTCP (mandatory) */
     appID: string;
 }
 
@@ -111,9 +118,14 @@ class RTCP extends RTCPEvents {
 
         // --- Initializations ---
 
-        // the very first thing: register background message handler to ensure we can receive messages in the background when the app is killed
-        setBackgroundMessageHandler(this.messaging, this._onRTCPNotification);
-        onMessage(this.messaging, this._onRTCPNotification);
+        /** the very first thing: register background message handler to ensure we can receive messages in the background when the app is killed */
+
+        // called when a push notification is received while the app is in the background or killed
+        setBackgroundMessageHandler(this.messaging, this._onRemoteNotification);
+        // called when a push notification is received while the app is in the foreground
+        onMessage(this.messaging, (message) => {
+            this._onRemoteNotification({ ...message, foreground: true });
+        });
 
         // request notification permissions if enabled
         if (this.requestPermissions) {
@@ -135,9 +147,10 @@ class RTCP extends RTCPEvents {
         }
 
         notifee.onBackgroundEvent(async ({ type, detail }: { type: EventType; detail: EventDetail }) => {
+            this.log("Event: Notifee onBackgroundEvent", type, detail);
             // PRESS: User tapped notification
             if (type === EventType.PRESS) {
-                await this._onRTCPNotification({ ...detail.notification, userInteraction: true });
+                await this._onLocalNotification(type, detail);
             }
         });
 
@@ -179,12 +192,15 @@ class RTCP extends RTCPEvents {
             await DefaultPreference.set("rtcp_base_url", RTCPApi.baseUrl);
             await DefaultPreference.set("rtcp_app_id", RTCPApi.appID);
             await DefaultPreference.set("rtcp_hardware_id", this.hardware_id);
+
+            this.log(await DefaultPreference.getAll());
         }
 
         // Listen for Notifee foreground events (currently only PRESS)
         notifee.onForegroundEvent(({ type, detail }: { type: EventType; detail: EventDetail }) => {
+            this.log("Event: Notifee onForegroundEvent", type, detail);
             if (type === EventType.PRESS) {
-                this._onRTCPNotification({ ...detail.notification, userInteraction: true });
+                this._onLocalNotification(type, detail);
             }
         });
     }
@@ -237,16 +253,17 @@ class RTCP extends RTCPEvents {
                 hardware_id: this.hardware_id,
                 push_token: this.token,
                 platform_type: Platform.OS === "ios" ? "IosPlatform" : "AndroidPlatform" as "IosPlatform" | "AndroidPlatform",
-                device_type: DeviceInfo.getDeviceType(),
+                device_type: DEVICE_TYPE_MAP[DeviceInfo.getDeviceType()] || "other",
                 api_version: "2",
                 sdk_version: SDK_VERSION,
                 tags: { app_version: DeviceInfo.getVersion() }
             };
             const deviceJson = JSON.stringify(device);
-
+            this.log("Registering device with RTCP Server" + (app_id ? " for appID " + app_id : "") + ": ", device);
             // check if registration data has changed. if not, do not register again to reduce server load
             const registeredDevice = await DefaultPreference.get(pref_key);
-            if (registeredDevice === null || registeredDevice !== deviceJson) {
+            //if (registeredDevice === null || registeredDevice !== deviceJson) {
+            if (true) {
                 // send registration to RTCP
                 if (await RTCPApi.registerDevice(device)) {
                     // store device data for later comparison
@@ -289,51 +306,58 @@ class RTCP extends RTCPEvents {
         if (this.autoRegister) await this.registerDevice();
     }
 
-    _onRTCPNotification = async (notification: Record<string, any>): Promise<void> => {
-        // TODO: check notification format on iOS
-
+    _onRemoteNotification = async (notification: Record<string, any>): Promise<void> => {
         // get hardware_id in case register event occurred before initialization finished
         if (!this.hardware_id) this.hardware_id = await DeviceInfo.getUniqueId();
 
-        if (!notification.userInteraction) {
-            // received a remote notification
-            if (notification.data.app_data) {
-                // on android values are strings only, convert to objects
-                if (typeof notification.data.app_data === "string") {
-                    notification.data.app_data = JSON.parse(notification.data.app_data);
-                }
-
-                notification.data = this._convertFromOld(notification.data);
+        if (notification.data.app_data) {
+            // on android values are strings only, convert to objects
+            if (typeof notification.data.app_data === "string") {
+                notification.data.app_data = JSON.parse(notification.data.app_data);
             }
 
-            this.log("Received remote push notification: ", notification);
+            notification.data = this._convertFromOld(notification.data);
+        }
 
+        this.log("Received remote push notification: ", notification);
+
+        if (notification.data.revoke) {
+            // remove notification from notification center
+            const id = this._buildNotificationID(notification.data.revoke);
+            if (id) await notifee.cancelNotification(id);
+        } else {
             // on Android create notification (on iOS notification is created by OS)
             if (Platform.OS === "android") {
                 this._handleAndroidNotification(notification.data);
             }
+        }
 
-            if (!(Platform.OS === "ios" && notification.message)) {
-                // update notification's remote status to "received" (on iOS done in NSE, except for silent pushes)
-                if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "received", notification.data.app_id);
-            }
+        if (!(Platform.OS === "ios" && notification.notification?.body)) {
+            // received a silent push which doesn't get processed by the NSE, so we have to update the remote status here.
+            if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "received", notification.data.app_id);
+        }
 
-            this._emitEvent("onRemoteNotification", notification);
-        } else {
+        this._emitEvent("onRemoteNotification", notification);
+    }
+
+    _onLocalNotification = async (type: EventType, detail: EventDetail): Promise<void> => {
+        const data = detail.notification?.data;
+
+        if (type === EventType.PRESS) {
             // user tapped notification
-            this.log("User tapped notification: ", notification);
+            this.log("User tapped notification: ", detail.notification);
 
-            if (notification.data.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, notification.data.push_id, "tapped", notification.data.app_id);
+            if (data?.push_id) RTCPApi.updateNotificationRemoteStatus(this.hardware_id, data.push_id as string, "tapped", data.app_id as string);
 
-            this._emitEvent("onNotificationTapped", notification);
+            this._emitEvent("onNotificationTapped", detail.notification);
 
-            if (this.deepLinking && notification.data.deeplink) {
-                DeviceEventEmitter.emit('url', { url: notification.data.deeplink });
+            if (this.deepLinking && data?.deeplink) {
+                DeviceEventEmitter.emit('url', { url: data?.deeplink });
             }
 
-            if (notification.data.url && this.openURL) {
-                if (await Linking.canOpenURL(notification.data.url)) {
-                    Linking.openURL(notification.data.url);
+            if (data?.url && this.openURL) {
+                if (await Linking.canOpenURL(data.url as string)) {
+                    Linking.openURL(data.url as string);
                 }
             }
         }
@@ -343,15 +367,12 @@ class RTCP extends RTCPEvents {
         // we need to run and wait for this, for when the app is awoken from killed, or displayNotification will be called too soon and not work
         await this._createChannel();
 
-        if (data.revoke) {
-            const id = this._buildNotificationID(data.revoke);
-            if (id) await notifee.cancelNotification(id);
-        } else if (data.message) {  // only show notification if a message is available
+        if (data.message) {  // only show notification if a message is available
             // Notifee data values must be strings, convert if necessary
-            const notifeeData: Record<string, string> = {};
+            const dataAsStrings: Record<string, string> = {};
             for (const [key, value] of Object.entries(data)) {
                 if (value !== null) {  // discard null values
-                    notifeeData[key] = typeof value === 'string' ? value : JSON.stringify(value);
+                    dataAsStrings[key] = typeof value === 'string' ? value : JSON.stringify(value);
                 }
             }
             await notifee.displayNotification({
@@ -361,9 +382,12 @@ class RTCP extends RTCPEvents {
                 android: {
                     channelId: this.channelId,
                     pressAction: { id: "default" },
-                    // TODO: add media
+                    ...(data.media_url && {
+                        largeIcon: null,
+                        style: { type: AndroidStyle.BIGPICTURE, picture: data.media_url }
+                    })
                 },
-                data: notifeeData
+                data: dataAsStrings
             });
         }
     }
