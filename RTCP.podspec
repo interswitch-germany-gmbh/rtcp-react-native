@@ -18,7 +18,14 @@ Pod::Spec.new do |s|
   s.preserve_paths = 'LICENSE', 'package.json', 'index.js'
 
   s.subspec 'RTCP' do |ss|
-    ss.source_files = 'ios/RTCP/**/*'
+    ss.source_files = [
+      'ios/RTCP/**/*',
+      'notifee/packages/react-native/ios/RNNotifee/*.{h,m}'
+    ]
+    ss.pod_target_xcconfig = {
+      'HEADER_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/notifee/ios'
+    }
+    ss.dependency 'React-Core'
   end
 
   s.subspec 'RTCPApi' do |ss|
@@ -26,8 +33,15 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'RTCPExt' do |ss|
-    ss.source_files = 'ios/RTCPExt/**/*'
+    ss.source_files = [
+      'ios/RTCPExt/**/*',
+      'notifee/ios/NotifeeCore/*.{h,m}',
+      'notifee/packages/react-native/ios/RNNotifee/NotifeeExtensionHelper.{h,m}'
+    ]
+    ss.pod_target_xcconfig = {
+      'HEADER_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/notifee/ios/NotifeeCore'
+    }
     ss.dependency 'RTCP/RTCPApi'
-    ss.dependency 'RNNotifeeCore'
   end
+
 end

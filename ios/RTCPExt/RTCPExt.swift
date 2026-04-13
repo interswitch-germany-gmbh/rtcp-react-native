@@ -1,6 +1,5 @@
 import UserNotifications
 import UIKit
-import RNNotifeeCore
 
 // Class for Notification Service Extension
 public class RTCPExt {
@@ -90,7 +89,7 @@ public class RTCPExt {
                         userInfo["notifee_options"] = ["data": data]
                         bestAttemptContent.userInfo = userInfo
 
-                        NotifeeExtensionHelper.populateNotificationContent(request, with: bestAttemptContent, withContentHandler: contentHandler)
+                        NotifeeCore.populateNotificationContent(request, with: bestAttemptContent, withContentHandler: contentHandler)
                     } else {
                         // store payload in Notifee's internal field, otherwise Notifee will not emit action events
                         bestAttemptContent.userInfo["__notifee_notification"] = ["data": data]

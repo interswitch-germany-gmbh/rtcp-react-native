@@ -2,7 +2,7 @@ import RTCPApi from "./RTCPApi";
 import RTCPEvents from "./RTCPEvents.js";
 
 import { getAPNSToken, getMessaging, onMessage, setBackgroundMessageHandler, getToken, Messaging } from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance, AndroidStyle, EventType, type EventDetail } from '@notifee/react-native';
+import notifee, { AndroidImportance, AndroidStyle, EventType, type EventDetail } from './notifee';
 import DeviceInfo from "react-native-device-info";
 import { Platform, AppState, Linking } from "react-native";
 import DefaultPreference from "react-native-default-preference";
@@ -356,9 +356,7 @@ class RTCP extends RTCPEvents {
             }
 
             if (data?.url && this.openURL) {
-                if (await Linking.canOpenURL(data.url as string)) {
-                    Linking.openURL(data.url as string);
-                }
+                Linking.openURL(data.url as string);
             }
         }
     }
@@ -383,8 +381,8 @@ class RTCP extends RTCPEvents {
                     channelId: this.channelId,
                     pressAction: { id: "default" },
                     ...(data.media_url && {
-                        largeIcon: null,
-                        style: { type: AndroidStyle.BIGPICTURE, picture: data.media_url }
+                        largeIcon: data.media_url,
+                        style: { type: AndroidStyle.BIGPICTURE, picture: data.media_url, largeIcon: null }
                     })
                 },
                 data: dataAsStrings

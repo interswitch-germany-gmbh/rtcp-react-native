@@ -84,8 +84,9 @@ class RTCPApi {
                     time: new Date().toISOString()
                 })
             });
-            if (!response.ok || !(await response.json()).processed) {
-                throw new Error("Received non-ok response from RTCP");
+            let res = await response.json();
+            if (!response.ok || !res.processed) {
+                throw new Error("Received non-ok response from RTCP: " + JSON.stringify(res));
             }
             return true;
         } catch (error) {
@@ -108,12 +109,11 @@ class RTCPApi {
             });
             let res = await response.json();
             if (!response.ok || !res.processed) {
-                throw new Error("Received non-ok response from RTCP");
+                throw new Error("Received non-ok response from RTCP: " + JSON.stringify(res) + " appid: " + this.appID);
             }
             return res.notifications || [];
         } catch (error) {
-            this.log("Error getting recent notifications:", error);
-            throw new Error("Error getting recent notifications:");
+            throw new Error("Error getting recent notifications: " + (error instanceof Error ? error.message : error));
         }
     }
 

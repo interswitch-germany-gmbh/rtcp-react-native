@@ -8,8 +8,6 @@
   - [Installation](#installation)
     - [Android Setup](#android-setup)
     - [iOS Setup](#ios-setup)
-      - [Objective-C (most common):](#objective-c-most-common)
-      - [Swift - if you migrated your AppDelegate to Swift:](#swift---if-you-migrated-your-appdelegate-to-swift)
   - [Usage](#usage)
     - [Deep Linking](#deep-linking)
     - [Inbox Module](#inbox-module)
@@ -32,15 +30,13 @@
   - [Reference - Ads Components](#reference---ads-components)
     - [RTCPAdImage](#rtcpadimage)
     - [RTCPAdsCarousel](#rtcpadscarousel)
-  - [Troubleshooting](#troubleshooting)
-    - [Runtime permission introduced in Android 13](#runtime-permission-introduced-in-android-13)
 
 ## About
 
 This is a React Native module for integrating Push Notifications with Interswitch's [RTCP Platform](https://rtcp.vanso.com).
 
-[!IMPORTANT]
-This documentation is for version 3.x and later of the module. If you are using version 2.x, please refer to the [v2 documentation](https://github.com/interswitch-germany-gmbh/rtcp-react-native/blob/v2.0.0/README.md).
+> [!IMPORTANT]
+> This documentation is for version 3.x and later of the module. If you are using version 2.x, please refer to the [v2 documentation](https://github.com/interswitch-germany-gmbh/rtcp-react-native/blob/v2.0.0/README.md).
 
 ## Requirements
 
@@ -48,7 +44,7 @@ This documentation is for version 3.x and later of the module. If you are using 
 - Android:
   - Android API Level >= 21
 - iOS:
-  - iOS >= 10  
+  - iOS >= 13
   - Cocoapods
 
 ## Installation
@@ -73,17 +69,19 @@ This documentation is for version 3.x and later of the module. If you are using 
 
   ```sh
   # using yarn
-  yarn add react-native-default-preference react-native-device-info @react-native-firebase/app @react-native-firebase/messaging
+  yarn add @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
 
   # using npm
-  npm install react-native-default-preference react-native-device-info @react-native-firebase/app @react-native-firebase/messaging
+  npm install @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
   ```
+
+- Set up your app for use with Google Firebase Cloud Messaging. See the [official documentation of the React Native Firebase SDK](https://rnfirebase.io) on how to do this.
 
 ### Android Setup
 
-Set up your app for use with Google Firebase Cloud Messaging. See the official documentation ([here](https://firebase.google.com/docs/cloud-messaging/android/client) and [here](https://rnfirebase.io/)) on how to do this. Here's a short summary:
+Set up the Firebase SDK for Android. Here is a quick summary of the required steps:
 
-- If not done for your app already, sign in to [Firebase Console](console.firebase.google.com), create a Firebase project and register your app.
+- On the [Firebase Console](https://console.firebase.google.com), add an Android app to your Firebase project.
 - Download the `google-services.json` file and put it into the folder `/android/app/` of your React Native app.
 - Follow the Gradle instructions to integrate the Firebase SDK
   - Add the Google Services Gradle plugin to your app
@@ -110,21 +108,37 @@ Set up your app for use with Google Firebase Cloud Messaging. See the official d
 
     ```
 
+Beyond setting up Firebase, no additional steps are required to configure the RTCP SDK on Android.
+
 ### iOS Setup
 
-// TODO: rework
+Set up the Firebase SDK for iOS. Here is a quick summary of the required steps:
 
-This module uses the [@react-native-community/push-notification-ios](https://github.com/react-native-push-notification-ios/push-notification-ios) module for iOS. Setup slightly differs from their instructions.
+- On the [Firebase Console](https://console.firebase.google.com), add an iOS app to your Firebase project.
+- Download the `GoogleService-Info.plist` file and put it into the folder `/ios/` of your React Native app.
+- Add the `GoogleService-Info.plist` file to your Xcode project. In Xcode, right-click on the folder with your app's name in the left sidebar and select "Add Files to <your app's name>". Then select the `GoogleService-Info.plist` file you just added to the `/ios/` folder.
+- Edit your `/ios/{projectName}/AppDelegate.swift` file and add the following:
 
-- Adjust your `/ios/Podfile` to create module headers for *push-notification-ios*:
+  ```swift
+  ...
+  import ReactAppDependencyProvider
+  import Firebase  // <-- add this line
+  ...
+  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+      FirebaseApp.configure()  // <-- add this line
+      ...
+  }
+  ```
+
+- Adjust your `/ios/Podfile` to create module headers for *GoogleUtilities*:
   
   ```ruby
   ...
   target '<yourReactNativeProject>' do
     ...
-    # add this line
-    pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios', :modular_headers => true
-    ...
+  pod 'GoogleUtilities', :modular_headers => true # <-- add this line
+  end
+  ...
   ```
 
 - Install the required Pods in your iOS project by running:
@@ -136,136 +150,19 @@ This module uses the [@react-native-community/push-notification-ios](https://git
   cd ios && pod install
   ```
 
-- Open your .xcworkspace in XCode. Add the following capabilities under "Signing & Capabilities":
-  - *Background Modes*, then tick *Remote notifications*
+Set up Firebase Cloud Messaging for iOS. Here is a quick summary of the required steps:
+
+- Open your .xcworkspace in Xcode. Add the following capabilities under "Signing & Capabilities":
+  - *Background Modes*, then tick *Background fetch* and *Remote notifications*
   - *Push Notifications*
-- Augment your Appdelegate  
 
-#### Objective-C (most common):  
-  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.h`
-
-    ```obj-c
-    // --> add this to the top of the file
-    #import <UserNotifications/UNUserNotificationCenter.h>
-    ```
-
-    For RN v0.71 and above:
-
-    ```obj-c
-    // --> add ' <UNUserNotificationCenterDelegate>' to this line
-    @interface AppDelegate : RCTAppDelegate <UNUserNotificationCenterDelegate>
-    ```
-
-    For RN v0.70 and below:
-
-    ```obj-c
-    // --> add ', UNUserNotificationCenterDelegate' to protocols in this line
-    @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate, UNUserNotificationCenterDelegate>
-    ```
-
-  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.m` or `/ios/<yourReactNativeProject>/AppDelegate.mm`
-
-    ```obj-c
-    // --> add this to the top of the file
-    #import <UserNotifications/UserNotifications.h>
-    @import RTCP;
-    ```
-
-    ```obj-c
-    // - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-    // {
-    //   ...
-      // --> add the following two lines before "return YES;" in the "didFinishLaunchingWithOptions" method
-      [RTCP didFinishLaunchingWithOptions:launchOptions];
-      UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-      center.delegate = self;
-    //
-    //   return YES;
-    // }  
-    ```
-
-    ```obj-c
-    // --> add these lines (before "@end" at the end of the file)
-    - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
-        NSDictionary *userInfo = notification.request.content.userInfo;
-        [RTCP didReceiveRemoteNotification:userInfo];
-        completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
-      }
-
-    - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-        [RTCP didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
-      }
-
-    - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-      [RTCP didFailToRegisterForRemoteNotificationsWithError:error];
-    }
-
-    - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-      [RTCP didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-    }
-
-    - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-      [RTCP didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-    }
-    // @end
-    ```
-
-#### Swift - if you migrated your AppDelegate to Swift:
-  - Modify the file `/ios/<yourReactNativeProject>/AppDelegate.swift`
-
-    ```swift
-    // --> add this to the top of the file
-    import RTCP
-    ```
-
-    ```swift
-    // --> add ', UNUserNotificationCenterDelegate' to protocols in this line
-    class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    ```
-
-    ```swift
-    // func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    //   ...
-      // --> add the following two lines before "return true" in the "didFinishLaunchingWithOptions" application method
-      RTCP.didFinishLaunching(withOptions: [UIApplication.LaunchOptionsKey: Any]())
-      UNUserNotificationCenter.current().delegate = self
-    //
-    //   return true
-    // }  
-    ```
-
-    ```swift
-    // --> add these lines (before '}' (end of class) at the end of the file)
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data ) {
-      RTCP.didRegisterForRemoteNotifications(withDeviceToken: deviceToken)
-    }
-
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-      RTCP.didFailToRegisterForRemoteNotifications(withError: error)
-    }
-
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-      RTCP.didReceiveRemoteNotification(userInfo, fetchCompletionHandler: completionHandler)
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-      completionHandler( [.alert, .badge, .sound])
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-      RTCP.didReceiveNotificationResponse(response, withCompletionHandler: completionHandler)
-    }
-    ```
-
-In order to enable extended features like Rich Push and Delivery Status you need to set up a *Notification Service Extension* in your project:
-
-- Add a Notification Service Extension:
+To configure the RTCP SDK for iOS, complete the following steps:
+- Add a Notification Service Extension to your app:
   - Open your .xcworkspace. In the menu select *File -> New -> Target...*
   - Choose *Notification Service Extension*
   - For *Product Name* enter: `RTCPNotificationServiceExtension`
   - Ensure `Swift` is selected as *Language*
   - Choose *Finish*. At the following popup dialog do not activate the scheme, click *Cancel* instead
-  - Select the new target `RTCPNotificationServiceExtension` in the *Project and Targets list*, go to *General*. Under *Deployment Info* choose at least: `iOS 10.0`
   - In *Project Explorer* open `RTCPNotificationServiceExtension/NotificationService.swift` and replace its entire content with:
 
     ```swift
@@ -348,7 +245,7 @@ RTCP.init({
 );
 ```
 
-With the rtcp-react-native module there is no difference in notification appearance if your app is in foreground or in background. Push notifications will always be shown as *heads-up notification*, even with the app in foreground.
+With the rtcp-react-native module there is no difference in notification appearance if your app is in the foreground or background. Push notifications will always be shown as *heads-up notification*, even with the app in foreground.
 
 If a user taps on a notification, you can react to that by registering to the `onNotificationTapped` event:
 
@@ -438,7 +335,7 @@ updateInbox(inbox) {
 }
 ```
 
-Though, instead of writing your own Component, we actually recommend using the shipped Inbox List Component below.
+However, instead of writing your own component, we recommend using the built-in Inbox List Component below.
 
 ### Inbox List Component
 
@@ -557,8 +454,8 @@ import { RTCPAdImage, RTCPAdsCarousel } from 'rtcp-react-native/RTCPAds';
 
 ...
 
-<RTCPAdImage zoneId=123 />
-<RTCPAdsCarousel zoneId=234 />
+<RTCPAdImage zoneId={123} />
+<RTCPAdsCarousel zoneId={234} />
 ```
 
 ## Reference - Core Module
@@ -581,7 +478,7 @@ Remove all notifications from the OS's notification center when the app is opene
 Time in milliseconds after which to run `clearOnStart` if enabled.
 
 * **`channelName`** *`(String) - optional, default: "Push Notifications" - Android only`*  
-Currently, RTCP only supports one single notification channel for Android. You can define the name of that notification channel as is appears in Androids Notification Settings for your app
+Currently, RTCP only supports one single notification channel for Android. You can define the name of that notification channel as it appears in Android's Notification Settings for your app
 
 * **`openURL`** *`(Boolean) - optional, default: true`*  
 Open URLs attached to the notification when the user opened the app by tapping the notification (uses `Linking.openURL()`).
@@ -698,7 +595,7 @@ Removes a `handler` function from the `event` list.
   - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
 
 - **`"onChangeAppID": (newAppID, oldAppID)`**  
-  Emitted when the the appID has changed through `registerDevice`  
+  Emitted when the appID has changed through `registerDevice`  
 
   *Function parameters*  
   - `newAppID` *(String)* - the new appID the SDK has been set to
@@ -712,7 +609,7 @@ Request user permission to receive notifications (iOS and Android API level >= 3
 
 *Parameters*
 
-- `rationale` *`(Object)`* - Rationale to be shown no Android as defined in [React Native Docs](https://reactnative.dev/docs/permissionsandroid#request)
+- `rationale` *`(Object)`* - Rationale to be shown on Android as defined in [React Native Docs](https://reactnative.dev/docs/permissionsandroid#request)
 
 
 ### Advanced Methods
@@ -727,7 +624,7 @@ in registration data, no request will be sent to the backend.
 This method is not required for normal operation since it is run automatically, unless `autoRegister` is set to false.
 It is designed and only required for use with multiple different backend applications (appIDs).
 
-To switch to another RTCP appID within a ReactNative application, call this method providing the new appID.
+To switch to another RTCP appID within a React Native application, call this method providing the new appID.
 The SDK will then switch to that appID globally. If the appID provided is different from the global appID before,
 the event `onChangeAppID` will be emitted.
 
@@ -809,7 +706,7 @@ function setRead(index)
 ```
 
 Sets the notification at `index` to be read (`read = true`) and sends this state update to the RTCP server.  
-To reduce server requests and load, these updates are queued up and send either 5 seconds after the last update has been made or when the app goes inactive.
+To reduce server requests and load, these updates are queued up and sent either 5 seconds after the last update has been made or when the app goes inactive.
 
 *Parameters*
 
@@ -867,7 +764,7 @@ Note: props for `RTCPNotification` and `RTCPNotificationBack` can also be provid
 
 ### RTCPInboxList
 
-In addition to everything from `SwipeListview` and `Flatlist`, the following props are available:
+In addition to everything from `SwipeListView` and `FlatList`, the following props are available:
 
 - **`onSyncError`** *`(function), default: Alert.alert("Error getting notifications from server. Please try again later.")`*  
   Function that is called when syncing the Inbox with the server on pull-to-refresh failed.
@@ -934,30 +831,3 @@ This component is based on a `FlatList` with `RTCPAdImage`s as horizontal items.
 
 - **`itemProps`** *`(Object), default: undefined`*  
   Props to forward to each image component.
-
-
-## Troubleshooting
-
-### Runtime permission introduced in Android 13
-
-Starting with Android 13 showing notifications requires the user to explicitly grant permission through a popup dialog (see [Android Documentation](https://developer.android.com/develop/ui/views/notifications/notification-permission)). For this a new permission called `POST_NOTIFICATIONS` was introduced. Its definition has been added to React Native in version 0.70.7. If your API level is >= 33 using older versions with this module will generate an error.
-
-To make it work with lower versions, you can manually add the permission definition to your React Native installation like this:
-
-Modify file `node_modules/react-native/Libraries/PermissionsAndroid/NativePermissionsAndroid.js`:
-
-```js
-export type PermissionType =
-  | 'android.permission.POST_NOTIFICATIONS'  // <- add this line
-  | 'android.permission.READ_CALENDAR'
-```
-
-and file `node_modules/react-native/Libraries/PermissionsAndroid/PermissionsAndroid.js`:
-
-```js
-const PERMISSIONS = Object.freeze({
-  POST_NOTIFICATIONS: 'android.permission.POST_NOTIFICATIONS',  // <- add this line
-  READ_CALENDAR: 'android.permission.READ_CALENDAR',
-```
-
-There's a [ready-to-use patch](examples/react-native.patch) available in the examples folder. It can also be used with the [patch-package](https://github.com/ds300/patch-package/) module, simply copy the file to `patches/react-native+<your-rn-version>.patch`.
