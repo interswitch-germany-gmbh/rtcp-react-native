@@ -2,7 +2,7 @@ import UserNotifications
 import UIKit
 
 // Class for Notification Service Extension
-public class RTCPExt {
+public class RTCPNSE {
     static let EXTENSION_SUFFIX = "RTCPNotificationServiceExtension"
 
     static var contentHandler: ((UNNotificationContent) -> Void)?
@@ -10,13 +10,13 @@ public class RTCPExt {
 
     public class func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         // store request and contentHandler for possible later use in expire function
-        RTCPExt.request = request
-        RTCPExt.contentHandler = contentHandler
+        RTCPNSE.request = request
+        RTCPNSE.contentHandler = contentHandler
 
         // get app group shared userDefaults
         if let bundle = Bundle.main.bundleIdentifier,                                                            // get extension bundle ID
-          bundle.hasSuffix(RTCPExt.EXTENSION_SUFFIX),                                                            // check extension bundle ID for correct naming
-          let bundleBase = bundle.prefix(upTo: bundle.index(bundle.endIndex, offsetBy: -(RTCPExt.EXTENSION_SUFFIX.count + 1))) as Substring?,  // remove extension name suffix from bundle ID
+          bundle.hasSuffix(RTCPNSE.EXTENSION_SUFFIX),                                                            // check extension bundle ID for correct naming
+          let bundleBase = bundle.prefix(upTo: bundle.index(bundle.endIndex, offsetBy: -(RTCPNSE.EXTENSION_SUFFIX.count + 1))) as Substring?,  // remove extension name suffix from bundle ID
           let userDefaults = UserDefaults(suiteName: "group." + bundleBase + ".rtcp")                            // get shared configuration by app group
         {
             var data = request.content.userInfo

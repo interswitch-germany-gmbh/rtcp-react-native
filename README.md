@@ -167,15 +167,15 @@ To configure the RTCP SDK for iOS, complete the following steps:
 
     ```swift
     import UserNotifications
-    import RTCP
+    import RTCPNSE
 
     class NotificationService: UNNotificationServiceExtension {
         override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-            RTCPExt.didReceive(request, withContentHandler: contentHandler)
+            RTCPNSE.didReceive(request, withContentHandler: contentHandler)
         }
 
         override func serviceExtensionTimeWillExpire() {
-            RTCPExt.serviceExtensionTimeWillExpire()
+            RTCPNSE.serviceExtensionTimeWillExpire()
         }
     }
     ```
@@ -199,7 +199,7 @@ To configure the RTCP SDK for iOS, complete the following steps:
 
     ```ruby
     target 'RTCPNotificationServiceExtension' do
-      pod 'RTCP/RTCPExt', path: '../node_modules/rtcp-react-native'
+      pod 'RTCPNSE', path: '../node_modules/rtcp-react-native'
     end
     ```
 

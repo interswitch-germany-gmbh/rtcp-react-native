@@ -1,11 +1,12 @@
 {
   "name": "rtcp-react-native",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.4",
   "description": "React Native module for integration with RTCP",
   "main": "dist/RTCP.js",
   "types": "dist/RTCP.d.ts",
   "files": [
     "RTCP.podspec",
+    "RTCPNSE.podspec",
     "react-native.config.js",
     "android",
     "dist",
