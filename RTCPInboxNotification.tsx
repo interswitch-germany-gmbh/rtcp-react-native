@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { View, Text, Modal, Linking, TouchableOpacity, TouchableHighlight, Animated } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 
 import defaultStyles from "./styles"
 

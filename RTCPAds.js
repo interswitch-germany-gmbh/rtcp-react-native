@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { Dimensions, FlatList, Linking, TouchableOpacity, View } from "react-native";
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import RTCPApi from "rtcp-react-native/RTCPApi";
 import RTCP from "./RTCP";
 

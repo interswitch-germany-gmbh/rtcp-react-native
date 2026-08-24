@@ -47,6 +47,9 @@ This is a React Native module for integrating Push Notifications with Interswitc
   - iOS >= 13
   - Cocoapods
 
+> [!IMPORTANT]
+> This package's `package.json` uses `exports` subpaths (e.g. `rtcp-react-native/RTCPInbox`). If your app is written in TypeScript, your `tsconfig.json` needs `"moduleResolution": "bundler"` (or `"node16"` / `"nodenext"`) for these subpath imports to resolve — the classic `"node"` resolution predates `exports` support.
+
 ## Installation
 
 - Add the module to your React Native app:
@@ -69,10 +72,10 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
+  yarn add @d11/react-native-fast-image @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
 
   # using npm
-  npm install @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
+  npm install @d11/react-native-fast-image @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
   ```
 
 - Set up your app for use with Google Firebase Cloud Messaging. See the [official documentation of the React Native Firebase SDK](https://rnfirebase.io) on how to do this.
@@ -799,7 +802,7 @@ In addition to everything from `SwipeListView` and `FlatList`, the following pro
 
 ### RTCPAdImage
 
-This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) to cache images and reduce server load.
+This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) (via the maintained [`@d11/react-native-fast-image`](https://github.com/Digital11/react-native-fast-image) fork) to cache images and reduce server load.
 
 - **`zoneId`** *`(Number) - mandatory`*  
   ID of the adserver zone to load images for
