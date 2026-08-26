@@ -47,16 +47,13 @@ This is a React Native module for integrating Push Notifications with Interswitc
   - iOS >= 13
   - Cocoapods
 
-> [!IMPORTANT]
-> This package's `package.json` uses `exports` subpaths (e.g. `rtcp-react-native/RTCPInbox`). If your app is written in TypeScript, your `tsconfig.json` needs `"moduleResolution": "bundler"` (or `"node16"` / `"nodenext"`) for these subpath imports to resolve — the classic `"node"` resolution predates `exports` support.
-
 ## Installation
 
 - Add the module to your React Native app:
 
   ```sh
   # using yarn
-  yarn add github:interswitch-germany-gmbh/rtcp-react-native
+  yarn add rtcp-react-native@github:interswitch-germany-gmbh/rtcp-react-native
 
   # using npm
   npm install github:interswitch-germany-gmbh/rtcp-react-native
@@ -65,17 +62,17 @@ This is a React Native module for integrating Push Notifications with Interswitc
   To install and bind to a specific version add the version tag as hash:
 
   ```sh
-  yarn add github:interswitch-germany-gmbh/rtcp-react-native#3.0.0
+  yarn add rtcp-react-native@github:interswitch-germany-gmbh/rtcp-react-native#3.0.0
   ```
 
 - Add all required peerDependencies, as they're not installed automatically ([why?](https://github.com/react-native-community/cli/issues/914#issuecomment-574759432)):
 
   ```sh
   # using yarn
-  yarn add @d11/react-native-fast-image @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
+  yarn add @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
 
   # using npm
-  npm install @d11/react-native-fast-image @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
+  npm install @react-native-firebase/app @react-native-firebase/messaging react-native-default-preference react-native-device-info
   ```
 
 - Set up your app for use with Google Firebase Cloud Messaging. See the [official documentation of the React Native Firebase SDK](https://rnfirebase.io) on how to do this.
@@ -450,6 +447,17 @@ The SDK provides two components to help integrate advertisements into an app:
 - `RTCPAdsCarousel`  
   This component loads all images from an ad zone and shows them as carousel. See the reference below for its settings.
 
+These components are based on [`FastImage`](https://github.com/Digital11/react-native-fast-image) to cache images and reduce server load.
+Before using these components, please install the module:
+
+```sh
+# using yarn
+yarn add @d11/react-native-fast-image
+
+# using npm
+npm install @d11/react-native-fast-image
+```
+
 See below for a basic sample:
 
 ```jsx
@@ -801,8 +809,6 @@ In addition to everything from `SwipeListView` and `FlatList`, the following pro
 ## Reference - Ads Components
 
 ### RTCPAdImage
-
-This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) (via the maintained [`@d11/react-native-fast-image`](https://github.com/Digital11/react-native-fast-image) fork) to cache images and reduce server load.
 
 - **`zoneId`** *`(Number) - mandatory`*  
   ID of the adserver zone to load images for
