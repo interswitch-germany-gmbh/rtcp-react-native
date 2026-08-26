@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0 / 2025-09-18
+
+### BREAKING CHANGES
+
+Starting from this version, the SDK is based on [Notifee](https://github.com/invertase/notifee), which replaces [react-native-push-notification](https://github.com/zo0r/react-native-push-notification).
+If you're migrating from a previous version, please check the README for the new setup instructions.
+
+Also note that the minimum supported React Native version is now 0.80.
+
 ## 2.2.2 / 2025-09-18
 
 * fix crash in AdImage.onPress() when url is empty
