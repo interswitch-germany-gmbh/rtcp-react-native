@@ -53,7 +53,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
 
   ```sh
   # using yarn
-  yarn add github:interswitch-germany-gmbh/rtcp-react-native
+  yarn add rtcp-react-native@github:interswitch-germany-gmbh/rtcp-react-native
 
   # using npm
   npm install github:interswitch-germany-gmbh/rtcp-react-native
@@ -62,7 +62,7 @@ This is a React Native module for integrating Push Notifications with Interswitc
   To install and bind to a specific version add the version tag as hash:
 
   ```sh
-  yarn add github:interswitch-germany-gmbh/rtcp-react-native#3.0.0
+  yarn add rtcp-react-native@github:interswitch-germany-gmbh/rtcp-react-native#3.0.0
   ```
 
 - Add all required peerDependencies, as they're not installed automatically ([why?](https://github.com/react-native-community/cli/issues/914#issuecomment-574759432)):
@@ -447,6 +447,17 @@ The SDK provides two components to help integrate advertisements into an app:
 - `RTCPAdsCarousel`  
   This component loads all images from an ad zone and shows them as carousel. See the reference below for its settings.
 
+These components are based on [`FastImage`](https://github.com/Digital11/react-native-fast-image) to cache images and reduce server load.
+Before using these components, please install the module:
+
+```sh
+# using yarn
+yarn add @d11/react-native-fast-image
+
+# using npm
+npm install @d11/react-native-fast-image
+```
+
 See below for a basic sample:
 
 ```jsx
@@ -798,8 +809,6 @@ In addition to everything from `SwipeListView` and `FlatList`, the following pro
 ## Reference - Ads Components
 
 ### RTCPAdImage
-
-This component is based on [`FastImage`](https://github.com/DylanVann/react-native-fast-image) to cache images and reduce server load.
 
 - **`zoneId`** *`(Number) - mandatory`*  
   ID of the adserver zone to load images for

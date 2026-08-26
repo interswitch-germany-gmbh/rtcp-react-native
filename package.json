@@ -57,6 +57,7 @@
     "react-native-device-info": ">= 12"
   },
   "devDependencies": {
+    "@d11/react-native-fast-image": "^8.13.0",
     "@react-native-firebase/app": "^23.8.6",
     "@react-native-firebase/messaging": "^23.8.6",
     "@types/react": "^19.2.4",
@@ -65,7 +66,6 @@
     "react-native": "^0.84.0",
     "react-native-default-preference": "^1.4.4",
     "react-native-device-info": "^15.0.2",
-    "react-native-fast-image": "^8.6.3",
     "react-native-safe-area-context": "^5.7.0",
     "react-native-swipe-list-view": "^3.2.9",
     "tsdown": "^0.21.4",
