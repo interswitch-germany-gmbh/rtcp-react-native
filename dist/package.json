@@ -1,0 +1,74 @@
+{
+    "name": "rtcp-react-native",
+    "version": "3.0.0-beta.4",
+    "description": "React Native module for integration with RTCP",
+    "main": "dist/RTCP.js",
+    "types": "dist/RTCP.d.ts",
+    "files": [
+        "RTCP.podspec",
+        "RTCPNSE.podspec",
+        "react-native.config.js",
+        "android",
+        "dist",
+        "ios",
+        "notifee/android/src/main",
+        "notifee/android/consumer-rules.pro",
+        "notifee/android/schemas",
+        "notifee/ios/NotifeeCore/",
+        "notifee/packages/react-native/ios/RNNotifee/",
+        "notifee/packages/react-native/android/src/main",
+        "notifee/packages/react-native/android/proguard-rules.pro"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/RTCP.d.ts",
+            "default": "./dist/RTCP.js"
+        },
+        "./RTCPInbox": {
+            "types": "./dist/RTCPInbox.d.ts",
+            "default": "./dist/RTCPInbox.js"
+        },
+        "./RTCPInboxList": {
+            "types": "./dist/RTCPInboxList.d.ts",
+            "require": "./dist/RTCPInboxList.js",
+            "import": "./dist/RTCPInboxList.js"
+        },
+        "./RTCPInboxNotification": {
+            "types": "./dist/RTCPInboxNotification.d.ts",
+            "require": "./dist/RTCPInboxNotification.js",
+            "import": "./dist/RTCPInboxNotification.js"
+        }
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prebuild": "genversion --es6 --semi notifee/packages/react-native/src/version.ts",
+        "build": "tsdown && tsc"
+    },
+    "author": "Hubert Nusser <hubert.nusser@interswitchgroup.com>",
+    "homepage": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
+    "repository": "https://github.com/interswitch-germany-gmbh/rtcp-react-native",
+    "license": "MIT",
+    "peerDependencies": {
+        "@react-native-firebase/app": ">= 17",
+        "@react-native-firebase/messaging": ">= 17",
+        "react": ">= 19",
+        "react-native": ">= 0.80",
+        "react-native-default-preference": ">= 1.4.4",
+        "react-native-device-info": ">= 12"
+    },
+    "devDependencies": {
+        "@react-native-firebase/app": "^23.8.6",
+        "@react-native-firebase/messaging": "^23.8.6",
+        "@types/react": "^19.2.4",
+        "genversion": "^3.2.0",
+        "react": "^19.2.4",
+        "react-native": "^0.84.0",
+        "react-native-default-preference": "^1.4.4",
+        "react-native-device-info": "^15.0.2",
+        "react-native-fast-image": "^8.6.3",
+        "react-native-safe-area-context": "^5.7.0",
+        "react-native-swipe-list-view": "^3.2.9",
+        "tsdown": "^0.21.4",
+        "typescript": "^6.0.2"
+    }
+}

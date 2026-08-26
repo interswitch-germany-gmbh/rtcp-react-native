@@ -1,0 +1,85 @@
+// Android library module that combines the notifee core and React Native bridge into a single
+// Gradle module, allowing consumers to compile both from source via React Native autolinking.
+
+plugins {
+  id "io.invertase.gradle.build" version "1.5"
+}
+
+if (project.hasProperty('reactNativeProjects')) {
+  reactNativeProjects.each { project.evaluationDependsOn(it) }
+} else {
+  project.evaluationDependsOn(':app')
+}
+
+def room_version = '2.5.0'
+def eventbus_version = '3.3.1'
+
+android {
+  namespace = "io.invertase.notifee"
+
+  defaultConfig {
+    minSdkVersion 20
+    targetSdkVersion 33
+    multiDexEnabled true
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments = [
+          "room.schemaLocation": "$projectDir/../notifee/android/schemas".toString(),
+          eventBusIndex: 'app.notifee.core.EventBusIndex'
+        ]
+      }
+    }
+  }
+  lintOptions {
+    disable 'GradleCompatible'
+    abortOnError false
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  buildTypes {
+    release {
+      consumerProguardFiles(
+        '../notifee/packages/react-native/android/proguard-rules.pro',
+        '../notifee/android/consumer-rules.pro'
+      )
+    }
+  }
+  compileSdkVersion = 34
+
+  sourceSets {
+    main {
+      java.srcDirs = [
+        '../notifee/packages/react-native/android/src/main/java',
+        '../notifee/android/src/main/java'
+      ]
+      res.srcDirs = ['../notifee/android/src/main/res']
+      manifest.srcFile 'src/main/AndroidManifest.xml'
+    }
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  api 'androidx.annotation:annotation:1.3.0'
+  api 'androidx.concurrent:concurrent-futures:1.1.0'
+  api 'androidx.work:work-runtime:2.8.0'
+  api 'com.facebook.fresco:fresco:2.6.0'
+  api "org.greenrobot:eventbus:$eventbus_version"
+
+  implementation("com.google.guava:guava:33.3.1-android")
+  implementation 'androidx.core:core:1.6.0'
+  implementation "androidx.room:room-runtime:$room_version"
+  implementation 'androidx.lifecycle:lifecycle-process:2.3.1'
+
+  annotationProcessor "androidx.room:room-compiler:$room_version"
+  annotationProcessor "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
+}
+
+ReactNative.shared.applyDefaultExcludes()
+ReactNative.module.applyReactNativeDependency("api")

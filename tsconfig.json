@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "es2015",
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "skipLibCheck": true
+  },
+  "include": ["RTCP.ts", "RTCPApi.ts", "RTCPEvents.ts", "RTCPInbox.ts", "RTCPInboxList.tsx", "RTCPInboxNotification.tsx", "styles.ts"],
+  "exclude": ["notifee-bundle.ts", "notifee", "dist", "node_modules", "examples"]
+}
