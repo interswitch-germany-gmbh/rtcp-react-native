@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { View, Text, Modal, Linking, TouchableOpacity, TouchableHighlight, Animated } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import defaultStyles from "./styles";
 export const RTCPInboxNotification = forwardRef(function RTCPInboxNotification(props, ref) {
     const { item, styles, headerText, onLinkOpen, renderFsImage } = props;

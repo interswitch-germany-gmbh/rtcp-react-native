@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.0.0 / 2025-09-18
+## 3.0.1 / 2026-08-27
+
+* reexport Notifee for the consumer
+
+## 3.0.0 / 2026-08-26
 
 ### BREAKING CHANGES
 

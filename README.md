@@ -276,12 +276,11 @@ Here is a sample notification object:
 }
 ```
 
-The Core Module copies all methods from `react-native-push-notification`, so all functions listed [there](https://github.com/zo0r/react-native-push-notification#local-notifications) can be used directly. Example:
+The Core Module exports the Notifee API, so all functions listed in the [Notifee documentation](https://notifee.app/react-native/reference) can be used directly. Example:
 
 ```js
-import RTCP from 'rtcp-react-native';
-
-RTCP.removeAllDeliveredNotifications();
+import RTCP, { notifee } from 'rtcp-react-native';
+notifee.cancelDisplayedNotifications();
 ```
 
 ### Deep Linking
@@ -597,13 +596,13 @@ Removes a `handler` function from the `event` list.
   Emitted when a push notification is received from the RTCP server.  
 
   *Function parameters*  
-  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+  - `notification` *(Object)* - the received push notification object
 
 - **`"onNotificationTapped": (notification)`**  
   Emitted when the app is opened by the user having tapped a notification in the OS's notification center.  
 
   *Function parameters*  
-  - `notification` *(Object)* - the received push notification as described in *zo0r/react-native-push-notification*
+  - `notification` *(Object)* - the received push notification object
 
 - **`"onChangeAppID": (newAppID, oldAppID)`**  
   Emitted when the appID has changed through `registerDevice`  
