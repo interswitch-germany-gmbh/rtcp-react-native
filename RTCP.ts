@@ -11,6 +11,9 @@ import { DeviceEventEmitter, PermissionsAndroid } from 'react-native';
 
 import { version as SDK_VERSION } from "./package.json";
 
+export * from './notifee';
+export { default as notifee } from './notifee';
+
 const DEVICE_TYPE_MAP: Record<string, string> = {
     Handset: "phone",
     Tablet: "tablet",

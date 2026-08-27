@@ -1,5 +1,7 @@
 import RTCPEvents from "./RTCPEvents.js";
 import { EventType, type EventDetail } from './notifee';
+export * from './notifee';
+export { default as notifee } from './notifee';
 declare const DEFAULTS: {
     /** Whether to connect to RTCP Staging or Production */
     production: boolean;
