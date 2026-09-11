@@ -14,8 +14,8 @@
     "notifee/android/src/main/**",
     "notifee/android/consumer-rules.pro",
     "notifee/android/schemas",
-    "notifee/ios/NotifeeCore/",
-    "notifee/packages/react-native/ios/RNNotifee/",
+    "notifee/ios/NotifeeCore/**",
+    "notifee/packages/react-native/ios/RNNotifee/**",
     "notifee/packages/react-native/android/src/main/**",
     "notifee/packages/react-native/android/proguard-rules.pro"
   ],
