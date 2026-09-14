@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2 / 2026-09-14
+
+* fix(ios): include notifee iOS source files in package files pattern
+
 ## 3.0.1 / 2026-08-27
 
 * reexport Notifee for the consumer
